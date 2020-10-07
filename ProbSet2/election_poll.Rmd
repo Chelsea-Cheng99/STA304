@@ -1,0 +1,214 @@
+---
+title: "Election Poll for the Liberal Party Canada: the Aurora-Oak Ridges-Richmond Hill riding"
+author: "Xi Cheng, Shichao Feng and Zhitong Liu"
+date: "October 6, 2020"
+output: 
+  pdf_document:
+    latex_engine: lualatex
+    number_sections: yes
+    toc: yes
+    toc_depth: 5
+  word_document:
+    toc: yes
+    toc_depth: '5'
+  html_document:
+    number_sections: yes
+    theme: united
+    toc: yes
+    toc_depth: 5
+    toc_float: no
+---
+
+```{r setup, include=FALSE, cache = FALSE}
+require("knitr")
+opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+opts_chunk$set(engine = "R")
+knitr::opts_chunk$set(echo = T)
+knitr::opts_chunk$set(message = F)
+knitr::opts_chunk$set(warning = F)
+## setting wd in DELL
+# opts_knit$set(root.dir = "~/Documents/")
+                                                 
+## cache = F, if cache = T, will not revaluate code chunk everytime
+## double or more space to insert a line break
+```
+
+
+```{r libs, echo = FALSE, warning= F}
+######################
+## Set up workspace
+######################
+rm(list = ls())
+require(tidyverse)
+require(magrittr)
+require(forcats)
+
+options(stringsAsFactors = F)
+options(dplyr.width = Inf)
+# getwd()
+
+# ######## clean memory ######################
+# rm(list = ls())
+# gc()
+# is(dds)
+# slotNames(dds)
+```
+
+# Executive Summary 
+
+
+```{r simulationdata, echo = FALSE, include=FALSE, eval= TRUE, warning= FALSE}
+#TODO: generate data by sample 
+
+test <- c("Very Sad", "Sad", "Neutral", "Happy", "Very Happy")
+# ?sample
+set.seed(666)
+
+sample(x = test, size = 20, replace = TRUE, prob = c(0.2, 0.1, 0.6, 0.05, 0.05))
+
+testDf <- tibble(randData = sample(1:10, size = 10, replace = TRUE ) )
+testDf
+
+# runif
+runif(10, min = 0, max = 10) %>% round(digits = 0)
+
+# rnorm
+rnorm(10, mean = 0, sd = 1)
+# sample size
+n <- 200
+df <- tibble( Age = round( runif(n, min = 18, max = 98), 0),
+              Gender = sample(c("Man", "Woman", "Other"), n, replace = TRUE, 
+                              prob = c(0.41, 0.58, 0.01) ))
+df %>% sample_n(10)
+
+
+```
+
+# Introduction
+In 2019, the Liberal Party which led by Justin Trudeau, won just 157 seats, compared to 184 seats in 2015. Although the Liberal Party was allowed to form a minority government, both the popular vote and the majority government were lost. Actually, the popular vote decreased by 6.35% to 33.12% in 2019 compared with 2015 (Zimonjic, 2019).  
+Toronto has a total of 25 Members of Parliament (MPs). Traditionally, Toronto has always been an vital source of support for the Liberal Party and the Liberals usually dominates the inner portion of the city. In the past two federal elections, the dominance of the Liberals was shaken in three electoral districts, Thornhill, Markham-Unionville and Aurora-Oak Ridges-Richmond Hill (AORRH). Out of those three ridings, the AORRH is the swing riding, where the Liberals was swept by the Conservatives in 2011, then won the next one by just 2.1% and eventually lost the last one by just 2.5% to the Conservatives again (CBC News, 2019). Interestingly, Leona Alleslev who was elected twice as the MP representing the riding of AORRH, crossed the floor to join the Conservative Party from the Liberal Party on September 17, 2018. The results of the last two election indicates that the Liberals has gained support from a significant amount of residents in this district. It is very likely that the Liberals might dominate this riding as well, through a better understanding of the resident profiles and a more accurate targeting.  
+Therefore, our campany, Petit Poll, has designed a online survey to target the 90,000 adult residents in the AORRH riding (Statistics Canada, 2016). The questions were developed to obtain basic demographics information of respondents, discover details during changes in votes of the last two elections, track the impact of the economy policies and the opinions on immigrants. Additionally, the impact of COVID-19 was also taken into considerations. In general, this is a probability sampling survey with a cross-section design. Moreover, monthly updates of this survey can build up a time-series analysis to track the opinions of the respondents on the Liberals. All code will be   
+
+# Methodology
+## Survey methodology
+This is a sample survey with a cross-sectional design. The target population for this survey is AORRH residents 18 years of age or older, roughly 90,000. The sampling frame used in this survey is the full list of address. The sample in this study is the respondent in this address. Only one respondent is allowed in an address within the same survey.    
+Incentives such as grocery store gift cards will be used to reduce non-response. Particularly, a letter with a five dollar gift card will be mailed to the randomly selected address (simple random sampling without replacement). The respondent will be directed to the online survey with the unique user name and password mailed in the letter. By completing the survey, the respondent will get another five dollar gift card. To protect the privacy, no identifiable personal information will be recorded during the survey. The sample size (completed surveys) will be about 200 to get a good coverage of the population.  
+With simple random sampling without replacement, we will have good estimations of population parameters:
+$$E(\bar{y} )= \mu_{y}$$
+$$Var(\bar{y}) = (1 - n/N)(s^{2}_{y} / n)$$
+The confidence interval for $\mu_{y}$:
+$$\bar{y} \pm z_{\alpha/2} \sqrt{(1 - n/N)(s^{2}_{y} / n)} $$
+Where n is the sample size, N is the population size, $s^{2}_{y} = \frac{1}{(n-1)} \Sigma_{i \in s}(y_i - \bar{y})^{2}$ and the significant level $\alpha$ is 0.05.  
+The questionnaire is relatively short and all questions are required to answer. All questions are provided with clear options, including the "other/ prefer not to say" option. The missing values can also replaced with imputation values such as sample mean during the post-survey analysis stage.  
+The total cost to conduct a survey will be about 20,000 dollars.  
+
+## Simulation 
+To test the performance of the survey, probability sampling methods were applied to generate the simulated survey results. The results were then demonstrated descriptively. In terms of the simulation, several assumptions were made according to reference datasets: Census 2016 data (Statistics Canada, 2016) and 2019 Canadian Election Study (Stephenson et al., 2019). In general, the underlying distributions or probability mass functions were assumed for different variables. The details will be found in the appendix.  
+
+
+
+```{r cleandata, echo = FALSE, eval=FALSE}
+# choose variables want to use
+df <- ces2019_web[, c("cps19_yob", "cps19_income_number")] %>% as.data.frame() %>% 
+   na.omit() %>% 
+# generate age from year of birth
+    mutate(age = 100 - cps19_yob) %>% dplyr::rename(Income = cps19_income_number) %>% dplyr::select(age, Income) %>% 
+# get rid of outliers in income 
+dplyr::filter(Income <= as.numeric(quantile(Income, probs = 0.999)[1])) %>%
+# make age categorical as 18-28, 28-38
+  mutate(Age_cate = cut(age, breaks = seq(18, 109, 10), right = FALSE )) %>% 
+   na.omit() %>% mutate(Age = fct_collapse(Age_cate, "[78, )" = c("[78,88)", "[88,98)", "[98,108)"))) %>% 
+# calculate median of household income by age group
+ group_by(Age) %>%
+    dplyr::summarize(MedianIn = median(Income, na.rm=TRUE))
+# Now we have age and total household income  
+# dim(df)
+# head(df)
+```
+
+
+
+```{r makeGraph, echo = FALSE}
+
+```
+
+# Introduction
+To ensure a strong sampling frame, to get a good probability based coverage of the population. To make sure a roughly equal opportunity to be sampled, use a list of every registered address in the country. Stick with probability-based sampling, and not paying respondents.  
+
+A probability sampling method is any method of sampling that utilizes some form of random selection. In order to have a random selection method, you must set up some process or procedure that assures that the different units in your population have equal probabilities of being chosen.  
+- Simple random sampling
+- Stratified random sampling
+- Cluster sampling
+- Systematic sampling: draw a sample by selecting individuals systematically from a list or line, such as select every 10th person on a class list.   
+
+
+# Background
+Decrements in aspects such as trust in politicians, satisfaction with democracy
+
+# Survey Methodology
+Probability Sampling Techniques.  
+1. Identify sampling frame, which is the complete list of all cases in the population from which your sample will be drawn.  
+2. Decide on sample size, better have large population and sample size.  
+Decide on confidence level, 95%.  
+Margin of error, which is the confidence interval.  
+3. Choose sampling technique
+
+
+
+
+# Results  
+
+
+```{r simulation}
+
+
+```
+
+# Survey
+
+Gender
+A man
+A woman
+Other
+
+
+No schooling
+Some/ completed elementary school
+Some/ completed secondary/ high school
+Some/ completed technical, community college
+Some university/ Bachelor's degree
+Master's degree
+Professional degree or doctorate
+Don't know/ Prefer not to answer
+
+No income
+$1 to $30,000
+$30,001 to $60,000
+$60,001 to $90,000
+$90,001 to $110,000
+$110,001 to $150,000
+$150,001 to $200,000
+More than $200,000
+Don't know/ Prefer not to answer
+
+Liberal Party
+Conservative Party
+NDP
+Green Party
+People's Party
+Other/ Prefer not to say
+
+# Appendix 
+## The survey
+
+## The simulated results
+
+## References
+CBC News. "Canada Votes 2019". https://newsinteractives.cbc.ca/elections/federal/2019/results/. 2019.  
+Statistics Canada. "Census Profile, 2016 Census". https://www12.statcan.gc.ca/census-recensement/2016/dp-pd/prof/details/page.cfm?Lang=E&Geo1=FED&Code1=35003&Geo2=PR&Code2=35&SearchText=aurora&SearchType=Begins&SearchPR=01&B1=All&TABID=1&type=0. 2016.  
+Stephenson, Laura, Allison Harrel, Daniel Rubenson and Peter Loewen. Forthcoming. 'Measuring Preferences and Behaviour in the 2019 Canadian Election Study,' Canadian Journal of Political Science.  
+Zimonjic, Peter. "Liberals take losses but win enough in Quebec and Ontario to form minority government". Canadian Broadcasting Corporation. Retrieved October 21, 2019.  
+
+
+
+
