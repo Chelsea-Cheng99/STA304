@@ -1,4 +1,4 @@
-This is LuaTeX, Version beta-0.80.0 (TeX Live 2015/Debian) (rev 5238)  (format=lualatex 2020.6.18)  7 OCT 2020 20:30
+This is LuaTeX, Version beta-0.80.0 (TeX Live 2015/Debian) (rev 5238)  (format=lualatex 2020.6.18)  7 OCT 2020 21:04
  restricted \write18 enabled.
 **election_poll.tex
 (./election_poll.tex
@@ -282,7 +282,7 @@ Inserting `luaotfload.aux.set_capheight' at position 3 in `luaotfload.patch_font
 '.
 Inserting `luaotfload.rewrite_fontname' at position 4 in `luaotfload.patch_font'
 .
-luaotfload | main : initialization completed in 0.046 seconds)
+luaotfload | main : initialization completed in 0.043 seconds)
 Lua module: fontspec 2016/02/01 2.5a Advanced font selection for LuaLaTeX. (/us
 r/share/texlive/texmf-dist/tex/latex/fontspec/fontspec-luatex.sty
 Package: fontspec-luatex 2016/02/01 v2.5a Font selection for XeLaTeX and LuaLaTe
@@ -1343,32 +1343,31 @@ luaotfload | load : path lookup of "latinmodern-math" unsuccessful, falling back
 [1
 
 {/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2]
-<election_poll_files/figure-latex/makeGraph1-1.pdf, id=52, 427.5975pt x 255.956
+<election_poll_files/figure-latex/makeGraph1-1.pdf, id=50, 427.5975pt x 255.956
 25pt>
 File: election_poll_files/figure-latex/makeGraph1-1.pdf Graphic file (type pdf)
 <use election_poll_files/figure-latex/makeGraph1-1.pdf>
 Package pdftex.def Info: election_poll_files/figure-latex/makeGraph1-1.pdf used 
-on input line 243.
+on input line 255.
 (pdftex.def)             Requested size: 427.59645pt x 255.95561pt.
-
-<election_poll_files/figure-latex/makeGraph2-1.pdf, id=53, 499.8675pt x 328.226
+[3<./election_poll_files/figure-latex/makeGraph1-1.pdf>]
+<election_poll_files/figure-latex/makeGraph2-1.pdf, id=65, 499.8675pt x 328.226
 26pt>
 File: election_poll_files/figure-latex/makeGraph2-1.pdf Graphic file (type pdf)
 <use election_poll_files/figure-latex/makeGraph2-1.pdf>
 Package pdftex.def Info: election_poll_files/figure-latex/makeGraph2-1.pdf used 
-on input line 256.
+on input line 267.
 (pdftex.def)             Requested size: 469.76872pt x 308.4626pt.
-[3<./election_poll_files/figure-latex/makeGraph1-1.pdf>] [4<./election_poll_file
-s/figure-latex/makeGraph2-1.pdf>] <more_questions.png, id=82, 605.26125pt x 825
-.0825pt>
+[4<./election_poll_files/figure-latex/makeGraph2-1.pdf>] <more_questions.png, i
+d=80, 605.26125pt x 825.0825pt>
 File: more_questions.png Graphic file (type png)
 <use more_questions.png>
-Package pdftex.def Info: more_questions.png used on input line 301.
+Package pdftex.def Info: more_questions.png used on input line 312.
 (pdftex.def)             Requested size: 469.75603pt x 640.36398pt.
 
-LaTeX Warning: Float too large for page by 13.99397pt on input line 304.
+LaTeX Warning: Float too large for page by 13.99397pt on input line 315.
 
-LaTeX Font Info:    Try loading font information for EU2+lmtt on input line 316.
+LaTeX Font Info:    Try loading font information for EU2+lmtt on input line 329.
 
 (/usr/share/texlive/texmf-dist/tex/latex/euenc/eu2lmtt.fd
 File: eu2lmtt.fd 2009/10/30 v1.6 Font defs for Latin Modern
@@ -1378,33 +1377,33 @@ luc)(load luc: /home/hithrill/.texmf-var/luatex-cache/generic/fonts/otf/lmmono10
 o10-italic.luc)(load luc: /home/hithrill/.texmf-var/luatex-cache/generic/fonts/o
 tf/lmmono10-italic.luc)
 LaTeX Font Info:    Font shape `EU2/lmtt/bx/n' in size <10> not available
-(Font)              Font shape `EU2/lmtt/b/n' tried instead on input line 318.
+(Font)              Font shape `EU2/lmtt/b/n' tried instead on input line 331.
 (compiling luc: /var/lib/texmf/luatex-cache/generic/fonts/otf/lmmonolt10-bold.lu
 c)(load luc: /home/hithrill/.texmf-var/luatex-cache/generic/fonts/otf/lmmonolt10
 -bold.luc) [5] [6<./more_questions.png>]
-Underfull \hbox (badness 10000) in paragraph at lines 366--369
+Underfull \hbox (badness 10000) in paragraph at lines 379--382
 \EU2/lmr/m/n/10 pd / prof / details / page . cfm ? Lang = E&Geo1 = FED&Code1 = 
 35003&Geo2 = PR&Code2 = 35&SearchText =
  []
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 385.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 402.
 [7]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 385.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 402.
 (./election_poll.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 385.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 385.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 402.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 402.
 )
 
 Here is how much of LuaTeX's memory you used:
- 29655 strings out of 495004
+ 29653 strings out of 495004
  125171,794899 words of node,token memory allocated
- 383 words of node memory still in use:
+ 378 words of node memory still in use:
    6 hlist, 2 vlist, 2 rule, 2 glue, 1 kern, 4 attribute, 43 glue_spec, 4 attrib
-ute_list, 3 action, 1 write nodes
-   avail lists: 1:4,2:1380,3:252,4:1463,5:326,6:5081,7:189,8:20,9:130,10:462
+ute_list, 2 action, 1 write nodes
+   avail lists: 1:5,2:1390,3:234,4:1309,5:308,6:4554,7:214,8:20,9:134,10:399
  32440 multiletter control sequences out of 65536+600000
- 67 fonts using 18625227 bytes
- 59i,6n,109p,969b,381s stack positions out of 5000i,500n,10000p,200000b,100000s
+ 67 fonts using 18625311 bytes
+ 59i,6n,109p,969b,344s stack positions out of 5000i,500n,10000p,200000b,100000s
 </usr/share/texmf/fonts/opentype/public/lm/lmmono10-regular.otf></usr/share/texm
 f/fonts/opentype/public/lm/lmmonolt10-bold.otf></usr/share/texmf/fonts/opentype/
 public/lm/lmmono10-italic.otf></usr/share/texmf/fonts/opentype/public/lm-math/la
@@ -1414,10 +1413,10 @@ hare/texmf/fonts/opentype/public/lm/lmroman10-bold.otf></usr/share/texmf/fonts/o
 pentype/public/lm/lmroman12-bold.otf></usr/share/texmf/fonts/opentype/public/lm/
 lmroman12-regular.otf></usr/share/texmf/fonts/opentype/public/lm/lmroman17-regul
 ar.otf>
-Output written on election_poll.pdf (7 pages, 122559 bytes).
+Output written on election_poll.pdf (7 pages, 124185 bytes).
 
-PDF statistics: 216 PDF objects out of 1000 (max. 8388607)
- 167 compressed objects within 2 object streams
- 34 named destinations out of 1000 (max. 131072)
+PDF statistics: 213 PDF objects out of 1000 (max. 8388607)
+ 164 compressed objects within 2 object streams
+ 32 named destinations out of 1000 (max. 131072)
  89 words of extra memory for PDF output out of 10000 (max. 10000000)
 

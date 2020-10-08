@@ -1,6 +1,6 @@
 ---
 title: "Election Poll for the Liberal Party Canada: the Aurora-Oak Ridges-Richmond Hill Electoral District"
-author: "Xi Cheng, Shichao Feng and Zhitong Liu"
+author: "Xi Cheng, Shichao Feng and Zhitong Liu (Group 61)"
 date: "October 6, 2020"
 output: 
   pdf_document: 
@@ -55,7 +55,7 @@ options(dplyr.width = Inf)
 ```
 
 # Executive Summary 
-The Liberal Party only won 2019 federal election by a small margin and lost two important things compared to its 2015 winning: the popular vote and the majority government. To fully understand the changes in the last two elections and closely track most up-to-date support rate, the famous swing riding Aurora-Oak Ridges-Richmond Hill in Toronto region was selected. It will serve as a good indicator for the next election. Online survey using random sampling was designed to target the whole population 18 years of age or older. The survey questions focusing on demographics, changes in the last two elections, economy policies, immigrants policies and trust in leaders were carefully designed. These issues are most cared ones which were claimed by local political leaders. By monthly polling updates, one can accurately estimate the overall opinions on those issues in this riding. Through a preliminary simulation study, we discovered the local demographic features such as respondents gender distribution could play an important role. Meanwhile, we also assured that the crossing the floor of Leona Alleslev, Member of Parliament, did damage the support rate of the Liberals decisively.  
+The Liberal Party only won 2019 federal election by a small margin and lost two important things compared to its 2015 winning: the popular vote and the majority government. To fully understand the changes in the last two elections, closely track most up-to-date support rate and win the next election for the Liberals, the famous swing riding Aurora-Oak Ridges-Richmond Hill in Toronto region was selected. It will serve as a good indicator for the next election. Online survey using random sampling was designed to target the whole population 18 years of age or older. The survey questions focusing on demographics, changes in the last two elections, economy policies, immigrants policies and trust in leaders were carefully designed. These issues are most cared ones which were claimed by local political leaders. By monthly polling updates, one can accurately estimate the overall opinions on those issues in this riding. Through a preliminary simulation study, we discovered the local demographic features such as respondents gender distribution could play an important role. Meanwhile, we also assured that the crossing the floor of Leona Alleslev, Member of Parliament, did damage the support rate of the Liberals decisively. In the future, we will definitely keep update results, questions and the data simulation methods as we are collecting more survey responses.     
 
 
 ```{r simulationdata, echo = FALSE, include=FALSE, eval= TRUE, warning= FALSE}
@@ -111,7 +111,7 @@ df %>% sample_n(10)
 # Introduction
 In 2019, the Liberal Party which led by Justin Trudeau, won just 157 seats, compared to 184 seats in 2015. Although the Liberal Party was allowed to form a minority government, both the popular vote and the majority government were lost. Actually, the popular vote decreased by 6.35% to 33.12% in 2019 compared with 2015 (Zimonjic, 2019).  
 Toronto has a total of 25 Members of Parliament (MPs). Traditionally, Toronto has always been an vital source of support for the Liberal Party and the Liberals usually dominates the inner portion of the city. In the past two federal elections, the dominance of the Liberals was shaken in three electoral districts, Thornhill, Markham-Unionville and Aurora-Oak Ridges-Richmond Hill (AORRH). Out of those three ridings, the AORRH is the swing riding, where the Liberals was swept by the Conservatives in 2011, then won the next one by just 2.1% and eventually lost the last one by just 2.5% to the Conservatives again (CBC News, 2019). Interestingly, Leona Alleslev who was elected twice as the MP representing the riding of AORRH, crossed the floor to join the Conservative Party from the Liberal Party on September 17, 2018. The results of the last two election indicates that the Liberals has gained support from a significant amount of residents in this district. It is very likely that the Liberals might dominate this riding as well, through a better understanding of the resident profiles and a more accurate targeting.  
-Therefore, our campany, Petit Poll, has designed a online survey to target the 90,000 adult residents in the AORRH riding (Statistics Canada, 2016). The questions were developed to obtain basic demographics information of respondents, discover details during changes in votes of the last two elections, track the impact of the economy policies and the opinions on immigrants/refugees. Additionally, the impact of COVID-19 was also taken into considerations. In general, this is a probability sampling survey with a cross-section design. Moreover, monthly updates of this survey can build up a time-series analysis to track the opinions of the respondents on the Liberals. All code will be hosted at https://github.com/Chelsea-Cheng99/STA304/tree/master/ProbSet2 to guarantee reproducibility.     
+Therefore, our campany, Petit Poll, has designed a online survey to target the 90,000 adult residents in the AORRH riding (Statistics Canada, 2016). The questions were developed to obtain basic demographics information of respondents, discover details during changes in votes of the last two elections, track the impact of the economy policies and the opinions on immigrants/refugees. Additionally, the impact of COVID-19 was also taken into considerations. In general, this is a probability sampling survey with a cross-section design. Moreover, monthly updates of this survey can build up a time-series analysis to track the opinions of the respondents on the Liberals. With this survey design, we were able to conduct preliminary simulation study utilizing random sampling and empirical probability distributions. The preliminary study showed that certain demographic features such as gender may contribute to the swing of this riding. Moreover, it was also shown that the lost of support rate in the Liberals as the crossing the floor of Leona Alleslev. All code will be hosted at https://github.com/Chelsea-Cheng99/STA304/tree/master/ProbSet2 to guarantee reproducibility.      
 
 # Methodology
 ## Survey methodology
@@ -124,12 +124,12 @@ The confidence interval for $\mu_{y}$:
 $$\bar{y} \pm z_{\alpha/2} \sqrt{(1 - n/N)(s^{2}_{y} / n)} $$
 Where n is the sample size, N is the population size, $s^{2}_{y} = \frac{1}{(n-1)} \Sigma_{i \in s}(y_i - \bar{y})^{2}$ and the significant level $\alpha$ is 0.05.  
 The questionnaire is relatively short and all questions are required to answer. All questions are provided with clear options, including the "other/ prefer not to say" option. The missing values can also replaced with imputation values such as sample mean during the post-survey analysis stage (Toepoel & Schonlau, 2017).     
-The total cost to conduct a survey will be about 20,000 dollars.  
+The total cost to conduct the first survey will be about 50,000 dollars, including background investigate, survey design and delivery, incentives, response collection, data analysis and report. Following survey will be 20,000 dollars each.  
 
 ## Simulation 
 To test the performance of the survey, probability sampling methods were applied to generate the simulated survey results. Common probability sampling methods include simple random sampling, stratified random sampling, cluster sampling and systematic sampling. Simple random sampling technique was mainly used in this study. The results were then demonstrated descriptively. In terms of the simulation, several assumptions were made according to reference datasets: Census 2016 data (Statistics Canada, 2016) and 2019 Canadian Election Study (Stephenson et al., 2019). In general, the underlying distributions or probability mass functions were assumed for different variables. Meanwhile, independence was assumed between questions. The details will be found in the appendix.  
 The survey was designed to gain knowledge on five aspects: demographics, how did this riding swing, trust in leaders, impact of economy policies and immigrants policies during COVID-19. With the simulated data, we will focus on the demographics and the changes between the last two elections. Because the underlying probability distribution assumptions are closer to the real-world scenario in these two cases.  
-All work were done in R (version 4.0.2) (R Core Team 2020) and Rstudio (version 1.3.1093). Tidyverse (version 1.3.0) was used for data wrangling and visualization (Wickham et al., 2019).
+All work were done in R (version 4.0.2) (R Core Team 2020) and Rstudio (version 1.3.1093). Tidyverse (version 1.3.0) was used for data wrangling and visualization (Wickham et al., 2019). R package "forcats" (version 0.5.0) was also used for data pre-processing (Hadley Wickham, 2020).
 
 ```{r cleandata, echo = FALSE, eval=TRUE}
 # choose variables want to use
@@ -177,8 +177,7 @@ p1
 genderP <- table(df$Gender)/n
 genderDiff <- (genderP[3] - genderP[1])*100
 ```
-
-The Figure 1 shows that more than half of the respondents are woman. If this pattern could be consistent along monthly polling updates, it would indicate that, in this riding, women are more likely to participate in political activities, by `r genderDiff`% compared to men. Therefore, targeting the women group might be an efficient campaign strategy. 
+The simulated gender distribution data using the empirical probability from the 2019 Canadian Election Study (Stephenson et al., 2019), which is 41% of man and 58% woman in that study. The data was generated as randomly sampling with replacement of the gender code with those probabilities. The Figure 1 shows that more than half of the respondents are woman. If this pattern could be consistent along monthly polling updates, it would indicate that, in this riding, women are more likely to participate in political activities, by `r genderDiff`% compared to men. Therefore, targeting the women group might be an efficient campaign strategy. 
 
 ```{r makeGraph2, echo = FALSE, fig.cap = "Votes Comparison 2019 Vs. 2015 by Parties: the Aurora-Oak Ridges-Richmond Hill", fig.width= 7, fig.height=5}
 
@@ -209,8 +208,7 @@ diffL <- partyP2015[2] - partyP2019[3]
 diffC <- partyP2019[1] - partyP2015[1]
 
 ```
-
-The Figure 2 was generated to demonstrate, in AORRH riding, the lost in support rate of the Liberals in 2019 as Leona Alleslev crossed the floor to join the Conservative Party from the Liberal Party on September 17, 2018. The change in support rate might seem marginally, but it is significant enought to be decisive. Compared with the 2015 federal election, the support rate of the Liberals decreased by `r diffL*100`%, leading to the defeats in this riding.  
+The simulated votes distribution data using the empirical probability from the 2019 and 2015 federal election results (CBC News 2015, 2019). The data was generated as randomly sampling with replacement of the party code with those probabilities. The detailed information can be found in the **Appendix**. The Figure 2 was generated to demonstrate, in AORRH riding, the lost in support rate of the Liberals in 2019 as Leona Alleslev crossed the floor to join the Conservative Party from the Liberal Party on September 17, 2018. The change in support rate might seem marginally, but it is significant enought to be decisive. Compared with the 2015 federal election, the support rate of the Liberals decreased by `r diffL*100`%, leading to the defeats in this riding.  
 
 # Discussions
 We believe that the swing riding is the most sensitive indicator of the federal election. Therefore, the Aurora-Oak Ridges-Richmond Hill riding was selected as the population of the survey. Due to the limits of the platform, we were only able to publish the first 10 questions in our survey. Questions on economy policies, immigrants and COVID-19 had to be removed. The questions were designed to focus on aspects about which the MP, Leona Alleslev most cares. Since we did not really have the data about the empirical distribution of answers to most of the survey questions, we simply used the random sample with replacement method with equal probability assumption. In future work, we will refine those empirical distributions by most up-to-date polling results. 
@@ -227,6 +225,7 @@ The survey was designed to gain knowledge on five aspects: demographics, how did
 ## The simulated results
 
 The following code was used to generate the simulated data. 
+All the code to repeat this work can be found at https://github.com/Chelsea-Cheng99/STA304/tree/master/ProbSet2.
 
 
 ```{r codeSim, echo=TRUE, eval=FALSE}
@@ -286,6 +285,8 @@ Stephenson, Laura, Allison Harrel, Daniel Rubenson and Peter Loewen. Forthcoming
 Vera Toepoel & Matthias Schonlau. Dealing with nonresponse: Strategies to increase participation and methods for postsurvey adjustments, Mathematical Population Studies, 24:2, 79-83, 2017.  
 
 Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686, https://doi.org/10.21105/joss.01686  
+
+Hadley Wickham (2020). forcats: Tools for Working with Categorical Variables (Factors). R package version 0.5.0. https://CRAN.R-project.org/package=forcats
 
 Zimonjic, Peter. "Liberals take losses but win enough in Quebec and Ontario to form minority government". Canadian Broadcasting Corporation. Retrieved October 21, 2019.  
 
