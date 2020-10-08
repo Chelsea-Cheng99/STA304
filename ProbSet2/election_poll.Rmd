@@ -1,5 +1,5 @@
 ---
-title: "Election Poll for the Liberal Party Canada: the Aurora-Oak Ridges-Richmond Hill riding"
+title: "Election Poll for the Liberal Party Canada: the Aurora-Oak Ridges-Richmond Hill Electoral District"
 author: "Xi Cheng, Shichao Feng and Zhitong Liu"
 date: "October 6, 2020"
 output: 
@@ -55,6 +55,7 @@ options(dplyr.width = Inf)
 ```
 
 # Executive Summary 
+The Liberal Party only won 2019 federal election by a small margin and lost two important things compared to its 2015 winning: the popular vote and the majority government. To fully understand the changes in the last two elections and closely track most up-to-date support rate, the famous swing riding Aurora-Oak Ridges-Richmond Hill in Toronto region was selected. It will serve as a good indicator for the next election. Online survey using random sampling was designed to target the whole population 18 years of age or older. The survey questions focusing on demographics, changes in the last two elections, economy policies, immigrants policies and trust in leaders were carefully designed. These issues are most cared ones which were claimed by local political leaders. By monthly polling updates, one can accurately estimate the overall opinions on those issues in this riding. Through a preliminary simulation study, we discovered the local demographic features such as respondents gender distribution could play an important role. Meanwhile, we also assured that the crossing the floor of Leona Alleslev, Member of Parliament, did damage the support rate of the Liberals decisively.  
 
 
 ```{r simulationdata, echo = FALSE, include=FALSE, eval= TRUE, warning= FALSE}
@@ -64,7 +65,8 @@ options(dplyr.width = Inf)
 set.seed(666)
 n = 200
 # simulate data
-df <- tibble( Age = round( runif(n, min = 18, max = 98), 0),
+df <- tibble( ID = 1:n,
+              Age = round( runif(n, min = 18, max = 98), 0),
               Gender = sample(c("Man", "Woman", "Other"), n, replace = TRUE, 
                               prob = c(0.41, 0.58, 0.01) ),
               Education = sample(c("Elementary", "High", 
@@ -113,8 +115,8 @@ Therefore, our campany, Petit Poll, has designed a online survey to target the 9
 
 # Methodology
 ## Survey methodology
-This is a sample survey with a cross-sectional design. The target population for this survey is AORRH residents 18 years of age or older, roughly 90,000. The sampling frame used in this survey is the full list of address. The sample in this study is the respondent in this address. Only one respondent is allowed in an address within the same survey.    
-Incentives such as grocery store gift cards will be used to reduce non-response. Particularly, a letter with a five dollar gift card will be mailed to the randomly selected address (simple random sampling without replacement). The respondent will be directed to the online survey with the unique user name and password mailed in the letter. By completing the survey, the respondent will get another five dollar gift card. To protect the privacy, no identifiable personal information will be recorded during the survey. The sample size (completed surveys) will be about 200 to get a good coverage of the population.  
+This is a sample survey with a cross-sectional design. The target population for this survey is AORRH residents 18 years of age or older, roughly 90,000. The sampling frame used in this survey is the full list of registered address in this riding. The sample in this study is the respondent in this address. Only one respondent is allowed in an address within the same survey. This sampling frame provides a good probability based coverage of the population.     
+Incentives such as grocery store gift cards will be used to reduce non-response. Particularly, a letter with a five dollar gift card will be mailed to the randomly selected address (simple random sampling without replacement). The respondent will be directed to the online survey with the unique user name and password mailed in the letter. By completing the survey, the respondent will get another five dollar gift card. Hence, we will use probability sampling, which is any method of sampling that utilizes some form of random selection. To protect the privacy, no identifiable personal information will be recorded during the survey. The sample size (completed surveys) will be about 200 to get a good coverage of the population.  
 With simple random sampling without replacement, we will have good estimations of population parameters:
 $$E(\bar{y} )= \mu_{y}$$
 $$Var(\bar{y}) = (1 - n/N)(s^{2}_{y} / n)$$
@@ -125,93 +127,102 @@ The questionnaire is relatively short and all questions are required to answer. 
 The total cost to conduct a survey will be about 20,000 dollars.  
 
 ## Simulation 
-To test the performance of the survey, probability sampling methods were applied to generate the simulated survey results. The results were then demonstrated descriptively. In terms of the simulation, several assumptions were made according to reference datasets: Census 2016 data (Statistics Canada, 2016) and 2019 Canadian Election Study (Stephenson et al., 2019). In general, the underlying distributions or probability mass functions were assumed for different variables. Meanwhile, independence was assumed between questions. The details will be found in the appendix.  
-
-
+To test the performance of the survey, probability sampling methods were applied to generate the simulated survey results. Common probability sampling methods include simple random sampling, stratified random sampling, cluster sampling and systematic sampling. Simple random sampling technique was mainly used in this study. The results were then demonstrated descriptively. In terms of the simulation, several assumptions were made according to reference datasets: Census 2016 data (Statistics Canada, 2016) and 2019 Canadian Election Study (Stephenson et al., 2019). In general, the underlying distributions or probability mass functions were assumed for different variables. Meanwhile, independence was assumed between questions. The details will be found in the appendix.  
+The survey was designed to gain knowledge on five aspects: demographics, how did this riding swing, trust in leaders, impact of economy policies and immigrants policies during COVID-19. With the simulated data, we will focus on the demographics and the changes between the last two elections. Because the underlying probability distribution assumptions are closer to the real-world scenario in these two cases.  
+All work were done in R (version 4.0.2) (R Core Team 2020) and Rstudio (version 1.3.1093). Tidyverse (version 1.3.0) was used for data wrangling and visualization (Wickham et al., 2019).
 
 ```{r cleandata, echo = FALSE, eval=TRUE}
 # choose variables want to use
 # Now we have age and total household income  
 # Transform data from wide to long 
-dfVotes <- df[, c("Votes_2015", "Votes_2019")]
+dfVotes <- df[, c("ID", "Votes_2015", "Votes_2019")] %>% 
+        gather(Votes, Parties, Votes_2015:Votes_2019, factor_key=TRUE) %>%  
+         dplyr::arrange(ID) %>% mutate(Parties = fct_relevel(Parties,
+                                                c("Liberal Party", "Conservative Party",
+                                     "NDP",  "Green Party", "People's Party", "Other")),
+                                     Votes = factor(Votes, levels =  c("Votes_2015", "Votes_2019"),
+                                                    labels = c("Votes: 2015", "Votes: 2019") ))
+        
 
+# dfVotes %>% head()
+# df[, c("ID", "Votes_2015", "Votes_2019")] %>% head()
 # dim(df)
 # head(df)
 ```
 
 
-
-```{r makeGraph, echo = FALSE}
-fontSize <- 14
-p1<-ggplot(data=df, aes(Gender)) +
-  geom_bar(aes(fill=Gender), stat="count", color="black", width = 0.5) +
-  labs(y = "Count",
-       title = "Gender Distribution: the Aurora-Oak Ridges-Richmond Hill riding") + 
-  scale_fill_brewer() +
-  # scale_fill_brewer(type = "div", palette = "RdBu") +
-  theme_bw() +
-theme(axis.text.x = element_text(size = fontSize -2, colour = "black"),
-      axis.text.y = element_text(size = fontSize - 2, colour = "black"),
-      axis.title.x = element_text(size = fontSize),
-      axis.title.y = element_text(size = fontSize),
-      legend.text = element_text(size= fontSize - 2),
-      legend.title = element_text(size= fontSize))
-p1
-
-
-fontSize <- 14
-p2<-ggplot(data=df, aes(Votes_2015)) +
-  geom_bar(aes(fill=Votes_2015), stat="count", color="black", width = 0.5) +
-  labs(y = "Count",
-       title = "Gender Distribution: the Aurora-Oak Ridges-Richmond Hill riding") + 
-  scale_fill_brewer() +
-  # scale_fill_brewer(type = "div", palette = "RdBu") +
-  theme_bw() +
-theme(axis.text.x = element_text(size = fontSize -2, colour = "black"),
-      axis.text.y = element_text(size = fontSize - 2, colour = "black"),
-      axis.title.x = element_text(size = fontSize),
-      axis.title.y = element_text(size = fontSize),
-      legend.text = element_text(size= fontSize - 2),
-      legend.title = element_text(size= fontSize))
-p2
-
-
-```
-
-# Introduction
-To ensure a strong sampling frame, to get a good probability based coverage of the population. To make sure a roughly equal opportunity to be sampled, use a list of every registered address in the country. Stick with probability-based sampling, and not paying respondents.  
-
-A probability sampling method is any method of sampling that utilizes some form of random selection. In order to have a random selection method, you must set up some process or procedure that assures that the different units in your population have equal probabilities of being chosen.  
-- Simple random sampling
-- Stratified random sampling
-- Cluster sampling
-- Systematic sampling: draw a sample by selecting individuals systematically from a list or line, such as select every 10th person on a class list.   
-
-
-# Background
-Decrements in aspects such as trust in politicians, satisfaction with democracy
-
-# Survey Methodology
-Probability Sampling Techniques.  
-1. Identify sampling frame, which is the complete list of all cases in the population from which your sample will be drawn.  
-2. Decide on sample size, better have large population and sample size.  
-Decide on confidence level, 95%.  
-Margin of error, which is the confidence interval.  
-3. Choose sampling technique
-
-
-
-
 # Results  
 
 
+```{r makeGraph1, echo = FALSE, fig.cap = "Gender Distribution of Respondents: the Aurora-Oak Ridges-Richmond Hill", fig.width= 6, fig.height=4}
+fontSize <- 12
+p1<-ggplot(data=df, aes(Gender)) +
+  geom_bar(aes(fill=Gender, y = stat(count)/sum(stat(count)) ), color="black", width = 0.5) +
+  labs(y = "Relative Frequencies",
+       title = "") + 
+  scale_y_continuous(labels=scales::percent) +
+  scale_fill_brewer() +
+  # scale_fill_brewer(type = "div", palette = "RdBu") +
+  theme_bw() +
+  # geom_text(aes(Age, MedianIn + 3000, label = round(MedianIn,2) ), color = "black", size = 4) +
+theme(axis.text.x = element_text(size = fontSize -2, colour = "black"),
+      axis.text.y = element_text(size = fontSize - 2, colour = "black"),
+      axis.title.x = element_text(size = fontSize),
+      axis.title.y = element_text(size = fontSize),
+      legend.text = element_text(size= fontSize - 2),
+      legend.title = element_text(size= fontSize),
+      legend.position="bottom")
+p1
 
+genderP <- table(df$Gender)/n
+genderDiff <- (genderP[3] - genderP[1])*100
+```
+
+The Figure 1 shows that more than half of the respondents are woman. If this pattern could be consistent along monthly polling updates, it would indicate that, in this riding, women are more likely to participate in political activities, by `r genderDiff`% compared to men. Therefore, targeting the women group might be an efficient campaign strategy. 
+
+```{r makeGraph2, echo = FALSE, fig.cap = "Votes Comparison 2019 Vs. 2015 by Parties: the Aurora-Oak Ridges-Richmond Hill", fig.width= 7, fig.height=5}
+
+fontSize <- 12
+p2<-ggplot(data=dfVotes, aes(x = Parties, group = Votes)) +
+  geom_bar(aes(fill=Votes, y = 2*stat(count)/sum(stat(count))), 
+           color="black", width = 0.5, position = "dodge") +
+  labs(y = "Relative Frequencies",
+       title = "") + 
+  scale_fill_brewer(type = "div") +
+  scale_y_continuous(labels=scales::percent) +
+  # scale_fill_brewer(type = "div", palette = "RdBu") +
+  theme_bw() +
+theme(axis.text.x = element_text(size = fontSize -2, colour = "black", angle = 20, vjust = 0.7),
+      axis.text.y = element_text(size = fontSize - 2, colour = "black"),
+      axis.title.x = element_text(size = fontSize),
+      axis.title.y = element_text(size = fontSize),
+      legend.text = element_text(size= fontSize - 2),
+      legend.title = element_text(size= fontSize),
+      legend.position="bottom")
+p2
+
+partyP2015 <- table(df$Votes_2015)/n
+
+partyP2019 <-  table(df$Votes_2019)/n
+
+diffL <- partyP2015[2] - partyP2019[3]
+diffC <- partyP2019[1] - partyP2015[1]
+
+```
+
+The Figure 2 was generated to demonstrate, in AORRH riding, the lost in support rate of the Liberals in 2019 as Leona Alleslev crossed the floor to join the Conservative Party from the Liberal Party on September 17, 2018. The change in support rate might seem marginally, but it is significant enought to be decisive. Compared with the 2015 federal election, the support rate of the Liberals decreased by `r diffL*100`%, leading to the defeats in this riding.  
+
+# Discussions
+We believe that the swing riding is the most sensitive indicator of the federal election. Therefore, the Aurora-Oak Ridges-Richmond Hill riding was selected as the population of the survey. Due to the limits of the platform, we were only able to publish the first 10 questions in our survey. Questions on economy policies, immigrants and COVID-19 had to be removed. The questions were designed to focus on aspects about which the MP, Leona Alleslev most cares. Since we did not really have the data about the empirical distribution of answers to most of the survey questions, we simply used the random sample with replacement method with equal probability assumption. In future work, we will refine those empirical distributions by most up-to-date polling results. 
+In terms of the underlying reasons of the swing, more sophisticated descriptive figures and tables can be generated to show how many individuals voted for the same party, how many voted for the Liberals then changed to the Conservatives as Leona Alleslev. In that case, it is a pre-post time series study. Because we assumed independence answers between questions, time-series analysis is not applicable in our case.  
 
 # Appendix 
 ## The survey
 The first 10 questions can be found at https://chelsea942995612.typeform.com/to/yCpsK2tR.  
 
-![More survey questions which cannot be published](more_questions.png)
+![More survey questions which cannot be published on Typeform.com](more_questions.png)
+
+The survey was designed to gain knowledge on five aspects: demographics, how did this riding swing, trust in leaders, impact of economy policies and immigrants policies during COVID-19.
 
 ## The simulated results
 
@@ -266,11 +277,15 @@ CBC News. "Canada Votes 2019". https://newsinteractives.cbc.ca/elections/federal
 
 CBC News. "Canada Votes 2015". https://www.cbc.ca/news2/interactives/results-2015/. 2015.  
 
+R Core Team. 2020. R: A Language and Environment for Statistical Computing. Vienna, Austria: R Foundation for Statistical Computing. https://www.R-project.org/.  
+
 Statistics Canada. "Census Profile, 2016 Census". https://www12.statcan.gc.ca/census-recensement/2016/dp-pd/prof/details/page.cfm?Lang=E&Geo1=FED&Code1=35003&Geo2=PR&Code2=35&SearchText=aurora&SearchType=Begins&SearchPR=01&B1=All&TABID=1&type=0. 2016.  
 
 Stephenson, Laura, Allison Harrel, Daniel Rubenson and Peter Loewen. Forthcoming. 'Measuring Preferences and Behaviour in the 2019 Canadian Election Study,' Canadian Journal of Political Science.  
 
 Vera Toepoel & Matthias Schonlau. Dealing with nonresponse: Strategies to increase participation and methods for postsurvey adjustments, Mathematical Population Studies, 24:2, 79-83, 2017.  
+
+Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686, https://doi.org/10.21105/joss.01686  
 
 Zimonjic, Peter. "Liberals take losses but win enough in Quebec and Ontario to form minority government". Canadian Broadcasting Corporation. Retrieved October 21, 2019.  
 
