@@ -1,0 +1,194 @@
+---
+title: Your Age, Gender and Where You Were Born May Explain Why You Are Alone in
+  Canada
+author: "Xi Cheng, Shichao Feng and Zhitong Liu"
+date: "October 18, 2020"
+header_includes: 
+   - \usepackage{amsmath} 
+   - \usepackage{dcolumn}
+output: 
+  pdf_document: 
+    number_sections: yes
+    toc: yes
+    toc_depth: 5
+    latex_engine: lualatex
+  word_document:
+    toc: yes
+    toc_depth: '5'
+  html_document:
+    number_sections: yes
+    theme: united
+    toc: yes
+    toc_depth: 5
+    toc_float: no
+
+---
+
+
+```{r setup, include=FALSE, cache = FALSE}
+require("knitr")
+opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+opts_chunk$set(engine = "R")
+knitr::opts_chunk$set(echo = T)
+knitr::opts_chunk$set(message = F)
+knitr::opts_chunk$set(warning = F)
+## setting wd in DELL
+# opts_knit$set(root.dir = "~/Documents/")
+                                                 
+## cache = F, if cache = T, will not revaluate code chunk everytime
+## double or more space to insert a line break
+```
+
+
+```{r libs, echo = FALSE, warning= F}
+######################
+## Set up workspace
+######################
+# rm(list = ls())
+require(tidyverse)
+require(captioner)
+require(stargazer)
+require(arsenal)
+# require(magrittr)
+# require(forcats)
+
+options(stringsAsFactors = F)
+options(dplyr.width = Inf)
+# getwd()
+
+# ######## clean memory ######################
+# rm(list = ls())
+# gc()
+# is(dds)
+# slotNames(dds)
+```
+
+```{r importdata, include=FALSE}
+gssAll <- read_csv("gss.csv")
+df <- read_csv("df.csv")
+dftmp <- gssAll %>% select(age, sex, place_birth_canada, marital_status) %>% drop_na()
+
+```
+
+
+
+```{r equations, include=FALSE}
+# To have numbered equations 
+```
+
+\begin{equation}
+y_j \sim 
+\end{equation}
+
+
+```{r fitglm, include=FALSE}
+mylg_age <- glm(factor(Marital) ~ age  , data = df, family = "binomial")
+summary(mylg_age)
+mylg_sex <- glm(factor(Marital) ~ sex , data = df, family = "binomial")
+summary(mylg_sex)
+mylg_place <- glm(factor(Marital) ~ place , data = df, family = "binomial")
+summary(mylg_place)
+mylg_1 <- glm(factor(Marital) ~ age + sex + place , data = df, family = "binomial")
+summary(mylg_1)
+mylg_age1 <- glm(factor(Marital) ~ age + age*sex + age*place, data = df, family = "binomial")
+summary(mylg_age1)
+
+```
+
+
+
+```{r tablesNumber, include=FALSE}
+table_nums <- captioner::captioner(prefix = "Table.")
+tab.1_cap <- table_nums(name = "tab_1", 
+                        caption = "German Bundesliga: Final Table 2015/16, Position 7-12")
+tab.2_cap <- table_nums(name = "tab_2", 
+                        caption = "German Bundesliga: Final Table 2015/16, Position 12-18")
+```
+
+
+
+```{r table1}
+my_labels <- list(
+  age = "Age",
+  sex = "Gender",
+  place_birth_canada = "Place of Birth",
+  marital_status = "Marital Status"
+)
+table1 <- tableby(~age + sex + place_birth_canada + marital_status, data = dftmp)
+summary(table1, labelTranslations = my_labels) %>% 
+   kable(caption = "Characteristics of the 2017 GSS")
+
+```
+
+
+```{r tablesum, results='asis', echo=FALSE}
+stargazer(mylg_age, mylg_sex, mylg_place, mylg_1, mylg_age1, 
+          title="Results",
+          #  align=TRUE,
+          type='latex', header=FALSE)
+```
+
+
+# Results
+
+```{r mcplot}
+load("mc_f.Rdata")
+plot(mc_f)
+```
+
+
+# Discussion
+
+In the 2017 GSS dataset. 
+
+## Weakness and next steps
+
+
+
+Among all 81 variables in the 2017 GSS data, besides the age, gender and POB used in this work, other variables such as province of residence, education level, household income level and having children or not might also be closely related to the singleness in Canada. A more completed modeling approach might 
+
+
+# Appendix 
+
+## Acknowledgement 
+The code used to clean the 2017 GSS dataset was from Dr. Rohan Alexander and Dr. Sam Caetano, please contact rohan.alexander@utoronto.ca for more information. The code was distributed under the MIT License.  
+
+## References
+
+Alathea, Letaw (2015). captioner: Numbers Figures and Creates Simple Captions. R package
+  version 2.2.3. https://CRAN.R-project.org/package=captioner
+
+Bürkner, Paul-Christian (2017). brms: An R Package for Bayesian Multilevel Models Using
+  Stan. Journal of Statistical Software, 80(1), 1-28. doi:10.18637/jss.v080.i01
+
+Bürkner, Paul-Christian (2018). Advanced Bayesian Multilevel Modeling with the R Package
+  brms. The R Journal, 10(1), 395-411. doi:10.32614/RJ-2018-017
+
+Firke, Sam (2020). janitor: Simple Tools for Examining and Cleaning Dirty Data. R package
+  version 2.0.1. https://CRAN.R-project.org/package=janitor
+
+Gelman Andrew (2019). Model building and expansion for golf putting. https://mc-stan.org/users/documentation/case-studies/golf.html.
+
+Gelman et al., (2020). Regression and Other Stories, Cambridge University Press, Ch 22.
+
+Heberer Ray (2019).Bayesian Priors and Regularization Penalties. https://towardsdatascience.com/bayesian-priors-and-regularization-penalties-6d0054d9747b.
+
+Hlavac, Marek (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables. R package version 5.2.1. https://CRAN.R-project.org/package=stargazer
+
+Kur, A Solomon (2019). Doing Bayesian Data Analysis in brms and the tidyverse version 0.0.5. https://bookdown.org/ajkurz/DBDA_recoded/
+
+Gabry J, Mahr T (2020). “bayesplot: Plotting for Bayesian Models.” R package version 1.7.2, https://mc-stan.org/bayesplot.
+
+Guo et al., (2020). RStan: R interface to Stan. https://mc-stan.org/rstan/.
+
+R Core Team (2020). R: A Language and Environment for Statistical Computing. Vienna, Austria: R Foundation for Statistical Computing. https://www.R-project.org/.  
+
+Statistics Canada (2019). Family matters: Being separated or divorced in Canada. https://www150.statcan.gc.ca/n1/pub/11-627-m/11-627-m2019033-eng.htm
+
+Statistics Canada (2019). Family matters: Being separated or divorced and aged 55 or older. https://www150.statcan.gc.ca/n1/pub/11-627-m/11-627-m2019036-eng.htm
+
+Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43),
+  1686, https://doi.org/10.21105/joss.01686
+
+Wickham, Hadley (2020). forcats: Tools for Working with Categorical Variables (Factors). R
+  package version 0.5.0. https://CRAN.R-project.org/package=forcats

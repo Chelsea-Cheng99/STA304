@@ -38,10 +38,10 @@ knitr::opts_chunk$set(warning = F)
 ######################
 ## Set up workspace
 ######################
-rm(list = ls())
+# rm(list = ls())
 require(tidyverse)
-require(magrittr)
-require(forcats)
+# require(magrittr)
+# require(forcats)
 
 options(stringsAsFactors = F)
 options(dplyr.width = Inf)

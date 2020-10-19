@@ -1,0 +1,10 @@
+require(tidyverse)
+# citations of all used packages
+# citation("tidyverse")
+# citation("forcats")
+# citation("janitor")
+# citation("brms")
+# citation("bayesplot")
+# citation("captioner")
+# citation("stargazer")
+# citation("arsenal")
