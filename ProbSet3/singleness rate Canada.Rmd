@@ -1,5 +1,5 @@
 ---
-title: Your Age, Gender and Where You Were Born May Explain Why You Are Alone in
+title: Your Age, Gender and Place of Birth May Explain Why You Are Alone in
   Canada
 author: "Xi Cheng, Shichao Feng and Zhitong Liu"
 date: "October 18, 2020"
@@ -26,6 +26,7 @@ output:
 
 
 ```{r setup, include=FALSE, cache = FALSE}
+# knitr settings
 require("knitr")
 opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
 opts_chunk$set(engine = "R")
@@ -49,6 +50,8 @@ require(tidyverse)
 require(captioner)
 require(stargazer)
 require(arsenal)
+require(bayesplot)
+require(brms)
 # require(magrittr)
 # require(forcats)
 
@@ -63,51 +66,120 @@ options(dplyr.width = Inf)
 # slotNames(dds)
 ```
 
+
+# Abstract
+It has been widely reported that more Canadians live alone now than ever before. In this study, the Bayesian hierarchical logistic regression model was applied to the 2017 Canadian General Social Survey – family (GSS) data, to discover potential important factors related with the singleness rate, including never married, divorced, separated and widowed cases. Our work demonstrated that age, gender and the place of birth (POB), and the correlation between age and sex were significantly associated with the singleness rate in Canada. Our results confirmed the descriptive results reported by Statistics Canada and provided a deeper understanding of the singleness issue in Canada. 
+
+
 ```{r importdata, include=FALSE}
+# load data 
 gssAll <- read_csv("gss.csv")
 df <- read_csv("df.csv")
+# subset and drop na
 dftmp <- gssAll %>% select(age, sex, place_birth_canada, marital_status) %>% drop_na()
 
 ```
 
 
+# Introduction
+The General Social Survey was designed to gather data on social trends in order to monitor changes of Canadians over time. The 2017 GSS focused changes in Canadian families, which contains information on marriages, family origins, child care and other socioeconomic characteristics (Statistics Canada, 2017). Descriptive results from this dataset have been published, which suggest different age groups have different likelihood to be separated or divorced (Statistics Canada, 2019). Moreover, women are more likely to be separated or divorced, and Canadian born as well (Statistics Canada, 2019).
+
+This work was built upon those findings, and was developed to test the associations between those factors such as age, gender and POB, and the likelihood of being alone. Particularly, the marital status was dichotomized into single and non-single. The single group was made up of divorced cases, separated cases, never-married single cases and widowed cases. The main reason of combining different sources of single group is to deal with the unbalanced group problem. Different single groups are minority groups, from 3.1% to 22.9% of whole population. Combination of groups together can increase sample size in the minority group, and increase the power of the statistical tests as well.
+
+The characteristics of the subset of 2017 GSS dataset used in the model fitting was demonstrated in this work. With a basic understanding of the dataset, the generalized linear model (GLM) approach was applied first to generate preliminary results. The preliminary results can guide us during the Bayesian Hierarchical logistic regression model, especially the model comparison stage. The detailed information of model used was shown in the **Model** section.
+
+This study demonstrated that age, gender and POB are significantly associated with the singleness rate. Particularly, women and elderly are more likely to be alone, and people born in Canada are more likely to be alone as well. Especially, the effect of age is significantly modified by gender, which means elder women are in the highest risk of being alone. Our results proved the descriptive reports published by Statistics Canada and might help in programs and policy making involving spousal support.
+
+# Data 
+The original dataset is the 2017 GSS focused changes in Canadian families (Statistics Canada, 2017).
+The survey is specially designed to gather information and impact areas involving spousal support, child care and parental benefits. The data collection through this survey was last from 2017-02-01 to 2017-11-30, which is from a sample survey with a cross-sectional design. The target population of this survey is all non-institutionalized persons 15 years of age or older, living in the 10 provinces of Canada (Statistics Canada, 2017). This is a large national survey, where approximately 43,000 questionnaires were sent and more than 20,000 of them were completed. The sampling frame is a list of address, associated with one or several telephone numbers. Moreover, GSS only selects one eligible person per household to be interviewed. The sampling is based on a stratified design employing probability sampling, where the stratification is done at province/census metropolitan area (CMA) level (Statistics Canada, 2017). The responding to this survey is voluntary, with overall response rate is 52.4%.
+
+The 
+
+# Model 
+Given that the predicted outcome estimated in this work is binary, either single or not, the natural modeling approach would be logistic regression. The outcome, singleness rate, was represented using Marital in this study. The predictors selected in this study contained age, gender(sex) and POB(place), the latter two are binary variables. Thus, the intercept of the model, and the coefficients of age might differ in different levels of gender and POB, which means the final model might have both population level and group level  coefficients. All together, these suggested the final model might be a hierarchical logistic regression, and both Frequentist and Bayesian approach were used. The Frequentist approach using the generalized linear model (GLM) is typically faster to fit compared with the Bayesian approach. Thus, the GLM approach can serve as the preliminary study of the Bayesian approach, making the model selection stage faster.  
+
+The models fitted in this study were listed below, following the R package “brms” model demonstration convention. In logistic regression, the outcome follows the Bernoulli/Binomial distribution and the probability in Bernoulli trial was transformed using Logit function. 
+
 
 ```{r equations, include=FALSE}
 # To have numbered equations 
+
+# equations of all models used in this study 
 ```
 
 \begin{equation}
-y_j \sim 
+y \sim Bernoulli(\frac{1}{1 + exp(-(a + bx))})
+\end{equation}
+
+\begin{equation}
+Marital \sim Bernoulli(\frac{1}{1 + exp(-(a + b_{age}x_{age}))})
+\end{equation}
+
+\begin{equation}
+Marital \sim Bernoulli(\frac{1}{1 + exp(-(a + b_{sex}x_{sex}))})
+\end{equation}
+
+\begin{equation}
+Marital \sim Bernoulli(\frac{1}{1 + exp(-(a + b_{place}x_{place}))})
+\end{equation}
+
+\begin{equation}
+Marital \sim Bernoulli(\frac{1}{1 + exp(-(a + b_{age}x_{age} + b_{sex}x_{sex} + b_{place}x_{place}))})
+\end{equation}
+
+\begin{equation}
+Marital \sim Bernoulli(\frac{1}{1 + exp(-(a + b_{age}x_{age} + b_{sex}x_{sex} + b_{place}x_{place} + b_{age*sex}x_{age*sex} + b_{age*place}x_{age*place}))})
 \end{equation}
 
 
 ```{r fitglm, include=FALSE}
+#  glm, logistic regression with age
 mylg_age <- glm(factor(Marital) ~ age  , data = df, family = "binomial")
 summary(mylg_age)
+# glm, logistic regression with sex
 mylg_sex <- glm(factor(Marital) ~ sex , data = df, family = "binomial")
 summary(mylg_sex)
+# glm, logistic regression with place
 mylg_place <- glm(factor(Marital) ~ place , data = df, family = "binomial")
 summary(mylg_place)
+# glm, logistic regression with sex age place
 mylg_1 <- glm(factor(Marital) ~ age + sex + place , data = df, family = "binomial")
 summary(mylg_1)
+# with correlations 
 mylg_age1 <- glm(factor(Marital) ~ age + age*sex + age*place, data = df, family = "binomial")
 summary(mylg_age1)
 
 ```
 
+# Methods
+Code supporting this analysis is available at: https://github.com/Chelsea-Cheng99/STA304/tree/master/ProbSet3. All datasets used in this study were kept locally, if you have the access of the 2017 GSS data, please check the gss_cleaning-1.R code to get the full dataset, followed by the getDf.R code to get the subset of data used in this work. All models were fit in the runModelBrms.R. Figures and tables were partly generated in mcmcplot.R. With the data.
 
+All work were done in R (version 4.0.2) (R Core Team 2020) and Rstudio (version 1.3.1093). Tidyverse (version 1.3.0) was used for data wrangling and visualization (Wickham et al., 2019). R package "forcats" (version 0.5.0) was also used for data pre-processing (Hadley Wickham, 2020). All R packages used in this study 
+
+# Results
 
 ```{r tablesNumber, include=FALSE}
+# numbering of tables with captions 
 table_nums <- captioner::captioner(prefix = "Table.")
 tab.1_cap <- table_nums(name = "tab_1", 
-                        caption = "German Bundesliga: Final Table 2015/16, Position 7-12")
+                        caption = "Characteristics Summary of the 2017 GSS Data")
 tab.2_cap <- table_nums(name = "tab_2", 
-                        caption = "German Bundesliga: Final Table 2015/16, Position 12-18")
+                        caption = "Characteristics Summary of the Combined groups of 2017 GSS")
+tab.3_cap <- table_nums(name = "tab_3", 
+                        caption = 
+                          "Summary of Logistic Regression Models (Generalized Linear Models )")
+
+tab.4_cap <- table_nums(name = "tab_4", 
+                        caption = "Summary of LOOIC of Logistic Regression Models (Bayesian)")
+
+tab.5_cap <- table_nums(name = "tab_5", 
+                        caption = "Standard Deviation Test: Complete Bayesian Hierarchical Model")
 ```
 
+`r table_nums('tab_1')`
 
-
-```{r table1}
+```{r table1, fig.cap=tab.1_cap, echo = FALSE}
 my_labels <- list(
   age = "Age",
   sex = "Gender",
@@ -116,24 +188,101 @@ my_labels <- list(
 )
 table1 <- tableby(~age + sex + place_birth_canada + marital_status, data = dftmp)
 summary(table1, labelTranslations = my_labels) %>% 
-   kable(caption = "Characteristics of the 2017 GSS")
+   kable()
 
 ```
 
 
-```{r tablesum, results='asis', echo=FALSE}
+`r table_nums('tab_2')`
+
+```{r table2, fig.cap=tab.2_cap, echo = FALSE}
+my_labels <- list(
+  age = "Age",
+  sex = "Gender",
+  place = "Place of Birth",
+  Marital = "Marital Status"
+)
+table2 <- tableby(~age + sex + place + Marital, data = df)
+summary(table2, labelTranslations = my_labels) %>% 
+   kable()
+
+```
+
+
+`r table_nums('tab_3')`
+
+```{r tablesum, results='asis', echo=FALSE, fig.cap=tab.3_cap}
 stargazer(mylg_age, mylg_sex, mylg_place, mylg_1, mylg_age1, 
-          title="Results",
+          # title="Results",
           #  align=TRUE,
           type='latex', header=FALSE)
 ```
 
 
-# Results
 
-```{r mcplot}
+
+`r table_nums('tab_4')`
+
+```{r mctest, echo = FALSE, fig.cap=tab.4_cap}
+# load results of fitted models 
 load("mc_f.Rdata")
-plot(mc_f)
+load("compare1_3.Rdata")
+load("compare_f.Rdata")
+
+# compare all models using LOOIC 
+looSum <- tibble( Number = 1:4,
+                  Models = c("~ sex", "~ age + sex", "~ age + (1 + age | sex)", 
+                   "~ age + (1 + age | sex) + (1 + age | place)"),
+     LOOIC = c(27940.8, 27871.9, 27506.4, 27469.6))
+
+looSum %>% kable()
+```
+
+
+`r table_nums('tab_5')`
+
+```{r sdtest, echo=FALSE, fig.cap=tab.5_cap}
+# use the final model to test the group effect 
+# obtain group-level effects, the difference of standard deviation between intercept and age
+hsex <- hypothesis(mc_f, "Intercept - age > 0", class = "sd", group = "sex")[["hypothesis"]][, 1:5]
+hsex[1,1] <- "s.d.: (Intercept-age) > 0 (Sex Group)"
+hplace <- hypothesis(mc_f, "Intercept - age > 0", class = "sd", group = "place")[["hypothesis"]][, 1:5]
+hplace[1,1] <- "s.d.: (Intercept-age) > 0 (POB Group)"
+
+rbind(hsex, hplace) %>% kable( col.names = c("Hypothesis", "Estimate", "Error", "Lower 95% CI",                          "Upper 95% CI"))
+```
+
+
+
+```{r fignum, include=FALSE}
+fig_nums <- captioner::captioner(prefix = "Figure.")
+fig.1_cap <- table_nums(name = "fig_1", 
+                        caption = "The Posterior Distribution of Age: Population Level (Bayesian Model3) ")
+fig.2_cap <- table_nums(name = "fig_2", 
+                        caption = "The Posterior Distribution of Age: Population Level (Bayesian Model4)")
+```
+
+
+`r fig_nums('fig_1')`
+
+```{r mcplot1, echo=FALSE, fig.cap=fig.1_cap}
+load("mc_test.Rdata")
+post <- posterior_samples(mc_test, add_chain = T)
+p1 <- mcmc_dens_overlay(post, pars = c("b_age")) +
+  theme(panel.grid = element_blank()) + labs(x = "Age: Population Level", y = "Density Plot")
+p1
+
+```
+
+`r fig_nums('fig_2')`
+
+```{r mcplot, echo=FALSE, fig.cap=fig.2_cap}
+
+post <- posterior_samples(mc_f, add_chain = T)
+p1 <- mcmc_dens_overlay(post, pars = c("b_age")) +
+  theme(panel.grid = element_blank()) + labs(x = "Age", y = "Density Plot")
+p1
+
 ```
 
 
@@ -149,6 +298,18 @@ Among all 81 variables in the 2017 GSS data, besides the age, gender and POB use
 
 
 # Appendix 
+
+## Supplementary results
+
+```{r moreresults, echo=FALSE}
+# summary results of 
+load("mc_test.Rdata")
+summary(mc_test)
+plot(mc_test)
+load("mc_f.Rdata")
+summary(mc_f)
+plot(mc_f)
+```
 
 ## Acknowledgement 
 The code used to clean the 2017 GSS dataset was from Dr. Rohan Alexander and Dr. Sam Caetano, please contact rohan.alexander@utoronto.ca for more information. The code was distributed under the MIT License.  
@@ -183,6 +344,8 @@ Guo et al., (2020). RStan: R interface to Stan. https://mc-stan.org/rstan/.
 
 R Core Team (2020). R: A Language and Environment for Statistical Computing. Vienna, Austria: R Foundation for Statistical Computing. https://www.R-project.org/.  
 
+Statistics Canada (2017). General Social Survey - Family (GSS). https://www23.statcan.gc.ca/imdb/p2SV.pl?Function=getSurvey&Id=335816
+
 Statistics Canada (2019). Family matters: Being separated or divorced in Canada. https://www150.statcan.gc.ca/n1/pub/11-627-m/11-627-m2019033-eng.htm
 
 Statistics Canada (2019). Family matters: Being separated or divorced and aged 55 or older. https://www150.statcan.gc.ca/n1/pub/11-627-m/11-627-m2019036-eng.htm
@@ -192,3 +355,5 @@ Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Softwar
 
 Wickham, Hadley (2020). forcats: Tools for Working with Categorical Variables (Factors). R
   package version 0.5.0. https://CRAN.R-project.org/package=forcats
+  
+Xie, Yihui (2020). knitr: A General-Purpose Package for Dynamic Report Generation in R. R package version 1.29.

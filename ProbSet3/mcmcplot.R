@@ -8,3 +8,16 @@ require(tidyverse)
 # citation("captioner")
 # citation("stargazer")
 # citation("arsenal")
+citation("knitr")
+
+
+
+load("mc_test.Rdata")
+# summary results of mc model fitting 
+summary(mc_test)
+# diagnostic plots of mcmc plot
+plot(mc_test)
+load("mc_f.Rdata")
+summary(mc_f)
+plot(mc_f)
+
