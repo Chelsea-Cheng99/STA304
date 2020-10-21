@@ -4,11 +4,17 @@ require(bayesplot)
 
 # load the subset of data
 df <- read_csv("df.csv")
+# use as single level as the base level 
+dftest <- df %>% mutate(single = ifelse(Marital == "Single", 0, 1) )
 
+glm01_test <- glm(single ~ age + age*sex , data = dftest, family = "binomial")
+summary(glm01_test)
 # fit model logistic regression 
 # glm, logistic regression with age, age*sex
 mylg_age0 <- glm(factor(Marital) ~ age + age*sex , data = df, family = "binomial")
 summary(mylg_age0)
+
+######## Compare the results, the single = 0 works the same as the factor(Maritla) ###########
 
 # logistic regression with age, age*sex, age*place 
 mylg_age1 <- glm(factor(Marital) ~ age + age*sex + age*place, data = df, family = "binomial")
@@ -35,6 +41,11 @@ summary(mylg_1)
 # plot(mylg_final)
 
 ## TODO: Bayesian, only use the sex as the predictor 
+# These options help Stan run faster:
+  
+# rstan_options(auto_write = TRUE)
+# options(mc.cores = parallel::detectCores())
+
 mc_first <- brm(factor(Marital) ~ sex,
                 data = df,
                 family = bernoulli(),

@@ -8,8 +8,8 @@ require(tidyverse)
 # citation("captioner")
 # citation("stargazer")
 # citation("arsenal")
-citation("knitr")
-
+# citation("knitr")
+# citation("tidybayes")
 
 
 load("mc_test.Rdata")
