@@ -10,7 +10,7 @@ require(tidyverse)
 # citation("arsenal")
 # citation("knitr")
 # citation("tidybayes")
-
+# citation("base")
 
 load("mc_test.Rdata")
 # summary results of mc model fitting 

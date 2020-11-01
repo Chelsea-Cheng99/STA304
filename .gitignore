@@ -41,3 +41,7 @@ vignettes/*.pdf
 
 *.csv
 *.txt
+
+# stata data
+
+*.dta
