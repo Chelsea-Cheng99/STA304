@@ -2,22 +2,62 @@
 title: "2020 United States Federal Election Prediction: Joe Biden vs Donald Trump"
 subtitle: ""
 author: "Xi Cheng, Guangyu Du, Shichao Feng and Zhitong Liu"
-thanks: "Code and data are available at: LINK."
-date: "`r format(Sys.time(), '%d %B %Y')`"
+thanks: "Code and data are available at: https://github.com/Chelsea-Cheng99/STA304/tree/master/ProbSet4"
+date: "October 31, 2020"
 abstract: |
   | First sentence. Second sentence. Third sentence. Fourth sentence. 
 output:
   bookdown::pdf_document2:
+header_includes: 
+   - \usepackage{amsmath} 
+   - \usepackage{dcolumn}
 toc: FALSE
 bibliography: references.bib
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
 
-library(tidyverse)
-
+```{r setup, include=FALSE, cache = FALSE}
+# knitr settings
+require("knitr")
+opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
+opts_chunk$set(engine = "R")
+knitr::opts_chunk$set(echo = T)
+knitr::opts_chunk$set(message = F)
+knitr::opts_chunk$set(warning = F)
+## setting wd in DELL
+# opts_knit$set(root.dir = "~/Documents/")
+                                                 
+## cache = F, if cache = T, will not revaluate code chunk everytime
+## double or more space to insert a line break
 ```
+
+
+```{r libs, echo = FALSE, warning= F}
+######################
+## Set up workspace
+######################
+# rm(list = ls())
+# load required packages
+require(tidyverse)
+require(captioner)
+require(stargazer)
+require(lme4)
+
+# require(magrittr)
+# require(forcats)
+
+options(stringsAsFactors = F)
+options(dplyr.width = Inf)
+# getwd()
+
+# ######## clean memory ######################
+# rm(list = ls())
+# gc()
+# is(dds)
+# slotNames(dds)
+```
+
+
 
 # Introduction
 
