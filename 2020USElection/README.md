@@ -4,8 +4,8 @@ This repo contains code and data for forecasting the US 2020 presidential electi
 
 Inputs contain data that are unchanged from their original. We use two datasets: 
 
-- [Survey data - detail how to get the survey data.]
-- [ACS data - detail how to get the ACS data.]
+- [Survey data - detail how to get the survey data: https://web.microsoftstream.com/video/80e25a4e-f33e-428e-94c9-b599ec374f43]
+- [ACS data - detail how to get the ACS data: https://web.microsoftstream.com/video/4e0770a4-89ef-403b-8480-cad62eaecd0a]
 
 Outputs contain data that are modified from the input data, the report and supporting material.
 
