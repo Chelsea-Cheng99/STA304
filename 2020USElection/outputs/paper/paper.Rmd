@@ -381,6 +381,8 @@ census_data <- census_data %>% mutate(vote = ifelse(estimate > 0.5, "Joe Biden",
 ```
 
 
+# Results
+
 ```{r resState, fig.cap="Election Forecast with 2018 ACS Census Data by State", message = FALSE,echo = FALSE, warning=FALSE, fig.height = 9, fig.width = 7}
 fontSize <- 12
 df <- census_data %>%
@@ -412,24 +414,34 @@ p1 <- ggplot(df,
 p1 
 ```
 
-# Results
-
+The overall popular vote was estimated by taking the population-level average of the probability by aggregation of all sub-cells together. Thus, our model predicted that Joe Biden might win th popular vote with 51.76% of all votes. Another approach to treat the predicted probability is to dichotomize the probability as either Biden or Trump by cutoff 0.5. Since Trump is the base level in our vote response variable, a probability greater than 0.5 means voting for Biden in our case. Figure 4 demonstrated that, through this approach, Donald Trump might win the electoral votes of 29 states, including crucial swing states such as Arizona, Florida, Iowa, North Carolina, Ohio, Pennsylvania, while Joe Biden might only win swing states including Michigan and Wisconsin.
 
 # Discussion
 
-## First discussion point
+## What have we learnt from the model
 
+Our results show the similar pattern that age, gender, race and state are important variables in election prediction [@Forecasting; @multiDistrict]. Detailed information of our final model fitting can be found in the **Appendix**. The employment status variable is not important in our model, which might because that this variable is similar to other socio-economic variables included in our model, such as household income and eduction. It is a good practice that do not use correlated features in the model. 
 
+## Why are we using MRP
 
-## Second discussion point
+Given random digit dialing (RDD) as an example, the response rates of RDD have declined to 9% in 2012 [@Forecasting]. Most people would agree that obtaining survey data from online community such as the generation of the Xbox data would be cheaper and faster compared with traditional methods such as RDD [@Forecasting].
 
-## Third discussion point
+Through post-stratification method, the final population-level estimates are actually estimated at cell-level. One could simply use the average of the response variable within each cell to obtain the cell-level  estimates. However, taking average is an unbiased estimation only if the samples are randomly drawn from the population, which requires the partition of cell is fine and might result in sparsity in cells [@Forecasting]. Fortunately, the multilevel regression model can provide accurate and robust cell-level estimates, while avoiding those issues caused by taking empirical means.
+
+As the number of variables and levels in each variable increases, the total number of cell can become enormous. Thus, it is very important to take robustness the small sub-groups estimation into consideration. Fortunately, sparse cells can borrow information from other cells. The idea is that if some cell has very little information then it’s coefficients will be drawn from an average of those cells that are similar. One strength of the MRP is that state-specific estimates can be obtained by using a state-specific post-stratification dataset.
+
+## The sex and gender problem in modern survey
+
+The Nationscape survey data gathered the information of gender, while the 2018 ACS data gathered the information of sex. It is worthwhile mentioning that sex and gender are two different things, however, in this study, we had to match sex to gender in order to make prediction with census data using survey data trained model. 
+While the measurements and the definition of sex and gender is continuously changing nowadays, challenges in response categories differ between sex and gender measurement. It is important to first understand that sex, by definition, refers to a set of biological attributes in humans and animals, while gender, by definition, refers to the socially constructed roles, behaviors, expressions and identities of girls, women, boys, men, and gender diverse people [@kennedy2020using]. Another problem is that sex and gender are not binary nowadays, which makes it difficult in constructing features. Thus, the authors mentioned in their paper "Our challenge increases when we consider that we are not simply moving to a more diverse way of coding sex, but instead a recognition that the construct of gender, while the same as sex assigned at birth for many, is a different construct for others." [@kennedy2020using]. The similar issue also exists in other variables such as race vs. ethnicity. 
 
 ## Weaknesses and next steps
 
 As we mentioned above, the sex and gender adjustment, classification and construct might introduce biases into the framework. Another source of systematic error might be that the survey data used for modeling was collected in June. It is possible that public opinion of Trump and Biden have affected by the events bound to the election. It can therefore be assumed that this error will sooner or later influence the final result of US 2020 Presidential Election. Future work might extend the MRP framework to time series analysis area, which would be helpful in discovering trend of support rate over time.
 
 Our final model partitioned the data into 32640 sub-cells and the census dataset to make the prediction has 466413 observations. On average, each sub-cell has about 15 samples. In terms of the number of sub-cells, the sample size about half a million might not be large enough. In our future work, a much larger census dataset could be used to make the prediction. 
+
+One potential limitation of the MRP model is that only categorical variables such as socio-economic, demographic, and geographic features are suitable to build sub-cells. In future work, a separated model can be developed to include variables mentioned in the Keys model [@theKeys]. An popular idea is that the accuracy of the prediction can be improved through stacking different models together, where each model is in charge of different aspects of information, such as different sets of un-correlated variables. All important "Keys" mentioned in the Keys model worth exploring in future study [@theKeys; @electionConcerns].
 
 \newpage
 
