@@ -1,9 +1,9 @@
 ---
 title: "Joe Biden, Another Hillary Clinton? 2020 US Federal Election"
 subtitle: "Multilevel Regression with Post-stratification (MRP) Framework Made the Prediction"
-author: "Xi Cheng, Guangyu Du, Shichao Feng and Zhitong Liu"
-thanks: "Code are available at: https://github.com/Chelsea-Cheng99/STA304/tree/master/2020USElection"
-date: "November 2, 2020"
+author: "Xi Cheng"
+thanks: "Code are available at: https://github.com/Chelsea-Cheng99/STA304/"
+date: "December 9th, 2020"
 abstract: |
   | There is no doubt that the most important political event taking place right now in the second half year of 2020 is the United States Federal Election, either Donald Trump or Joe Biden, who can win the throne in the White House remains unknown. As the COVID-19 pandemic continues, people all over the world have never been this desperate to know the results of the 2020 United States Federal Election, which might determine the global political and economic trends in the next several years. In this study, the multilevel (logistic) regression with post-stratification (MRP) framework was trained with the Nationscape survey data, then the prediction was made with American Community Survey (ACS) national census data which is the dataset considered to be unbiased and representative. Our work demonstrated that, Joe Biden might win the overall popular vote by 1.76% but lose the electoral vote, by including socio-economic, demographic, and geographic features such as gender, age groups, education and household income into the model. 
   |
