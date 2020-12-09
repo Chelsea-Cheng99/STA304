@@ -45,3 +45,7 @@ vignettes/*.pdf
 # stata data
 
 *.dta
+
+# previous work
+2020USElection/outputs/paper/paper.pdf
+
