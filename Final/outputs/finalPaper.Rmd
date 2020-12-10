@@ -67,7 +67,15 @@ options(dplyr.width = Inf)
 
 ## broader context more detail about what you're interested in, what you did, what you found, why it's important
 
+It has been argued that the information revolution is destroying the traditional newspaper industry around the world right now, from local newspaper to national newspaper. It has been demonstrated that, with the rise of the Internet, the revenues, the advertisers and even the number of journalists employed of the newspaper industry has been steadily decreased, roughly since 2005 (). Therefore, there is a growing concern that the quantity of high-quality content might decrease as well ().
+However, the direct accurate causes of the declination of the newspaper remain debatable. Although it is obvious that there is a strong negative correlation between the trend of the Internet and the trend of traditional newspaper industry. One could still argue that, there might exist a third factor such as the changing customer preferences driving both trends (). Similarly, the causality between the decrease in number of journalists employed and the decrease in the advertising revenues remains uncertain as well. Hence, specific hypothesis must be proposed. 
+
+
 ## the research
+
+In their study, they focused on the effects of the decline in advertising revenues on the quality of the newspapers’ content (). To investigate this relationship, they built a model based on several conditions and assumptions, including using a monopoly newspaper which is able to choose the prices of subscription and advertisement, letting readers to be heterogeneous in the types of high-quality content, assuming that more journalist-intensive content increases more costs. 
+In terms of the statistical method, the difference-in-differences analysis was applied to derive the causality (). With all above framework, they was trying to prove that a decline in advertising revenues may cause a decline in the amount of high-quality content produced, a drop in reader subscription prices and a change in the composition of readership toward a less wealthy readership ().
+
 
 ## the outline and summary results 
 
