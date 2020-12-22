@@ -5,9 +5,9 @@ author: "Xi Cheng"
 thanks: "Code are available at: https://github.com/"
 date: "December 9th, 2020"
 abstract: |
-  |  In 2019, researchers Charles Angelucci and Julia Cagé have done the analysis of the relationship between the newspapers’ content and the reduction in advertising revenues. They found robust evidence which demonstrated that a reduction in advertising revenues lowers newspapers’ incentives to produce journalistic-intensive content through difference-in-differences analysis. In this work, the same dataset and the difference-in-differences analysis was applied as well. As a result, similar results were obtained as the published paper. 
+  |  In 2019, researchers Charles Angelucci and Julia Cagé have done the analysis of the relationship between the newspapers’ content and the reduction in advertising revenues. They found robust evidence which demonstrated that a reduction in advertising revenues lowers newspapers’ incentives to produce journalistic-intensive content through the difference-in-differences analysis. In this work, the same dataset was used and the difference-in-differences analysis was applied as well to reproduce their work. In general, similar results were obtained by this work compared to the published paper. 
   |
-  | **Keywords:** Newspapers; Difference-in-Differences Analysis; Causal-Inference;  Newspapers’ Content; Advertising Revenues;
+  | **Keywords:** Newspapers; Difference-in-Differences Analysis; Causal-Inference;  Newspapers’ Content; Advertising Revenues; Number of Journalists;
 output:
   pdf_document: 
     latex_engine: lualatex
@@ -15,7 +15,7 @@ header_includes:
    - \usepackage{amsmath} 
    - \usepackage{dcolumn}
 toc: FALSE
-bibliography: references.bib
+bibliography: references1.bib
 ---
 
 
@@ -43,16 +43,19 @@ knitr::opts_chunk$set(warning = F)
 # load required packages
 require(tidyverse)
 require(captioner)
-# require(stargazer)
+require(stargazer)
 library(gridExtra)
 library(broom)
+library(haven)
+library(grid)
 require(arsenal)
 require(magrittr)
-require(forcats)
+require(gtable)
+library(RColorBrewer)
 
 options(stringsAsFactors = F)
 options(dplyr.width = Inf)
-# getwd()
+getwd()
 
 # ######## clean memory ######################
 # rm(list = ls())
@@ -81,8 +84,13 @@ In terms of the statistical method, the difference-in-differences analysis was a
 
 
 ```{r load_data, echo = FALSE, warning = FALSE,message = FALSE}
-# survey_data <- read_csv("survey.csv")
-# census_data <- read_csv("census.csv")
+# the first dataset is for linear regression
+dfNews <- read_dta("data/Angelucci_Cage_AEJMicro_dataset.dta")
+# others for figures
+df1 <- read_dta("data/Angelucci_Cage_AEJMicro_Descriptive_evidence_US.dta")
+df23 <- read_dta("data/Angelucci_Cage_AEJMicro_Descriptive_evidence_advertising_industry.dta")
+df4 <- read_dta("data/Angelucci_Cage_AEJMicro_Descriptive_evidence_advertisement.dta")
+df5 <- read_dta("data/Angelucci_Cage_AEJMicro_Descriptive_evidence_television_quality.dta")
 
 ```
 
@@ -100,77 +108,97 @@ The characteristics of data through tables (Table 1. and Table 2.).
 table_nums <- captioner::captioner(prefix = "Table.")
 # Table captions
 tab.1_cap <- table_nums(name = "tab_1",
-                        caption = "Characteristics Summary of ")
+                        caption = "Characteristics Summary of National Daily Newspapers")
 tab.2_cap <- table_nums(name = "tab_2",
-                        caption = "Characteristics Summary of ")
+                        caption = "Characteristics Summary of Local Daily Newspapers")
+
+# results summary table 
+tab.3_cap <- table_nums(name = "tab_3",
+                        caption = "Advertising Side")
+tab.4_cap <- table_nums(name = "tab_4",
+                        caption = "Reader Side")
+tab.5_cap <- table_nums(name = "tab_5",
+                        caption = "Quality")
 
 ```
 
 
-```{r orderData, include=FALSE}
-# # reorder data of survey_data, for all categorical variables 
-# survey_data$age %<>% as.factor()
-# survey_data$gender %<>% as.factor()
-# survey_data$race %<>% as.factor()
-# survey_data$education %<>% as.factor()
-# survey_data$household_income %<>% as.factor()
-# survey_data$employment %<>% as.factor()
-# survey_data$stateid %<>% as.factor()
-# survey_data$state %<>% as.factor()
-# 
-# # revalue and relevel vote, Donald Trump as the base level
-# survey_data$vote %<>% as.factor()
-# survey_data$vote <- plyr::revalue(survey_data$vote, c("0" = "Donald Trump", "1" = "Joe Biden"))
-# survey_data$vote %>% levels()
-# 
-# # the levels of age is fine 
-# survey_data$age %>% levels()
-# survey_data$gender %>% levels()
-# survey_data$race %>% levels()
-# survey_data$employment %>% levels()
-# survey_data$stateid %>% levels()
-# 
-# # reorder the levels 
-# survey_data$education <- factor(survey_data$education ,
-#                                         levels(survey_data$education )[c(3, 4,1:2)])
-# survey_data$household_income <- factor(survey_data$household_income,
-#                                       levels(survey_data$household_income)[c(5, 3, 4,1:2)])
-# 
-# 
-# # reorder data of census data, the same 
-# census_data$age %<>% as.factor()
-# census_data$gender %<>% as.factor()
-# census_data$race %<>% as.factor()
-# census_data$education %<>% as.factor()
-# census_data$household_income %<>% as.factor()
-# census_data$employment %<>% as.factor()
-# census_data$stateid %<>% as.factor()
-# census_data$state %<>% as.factor()
-# 
-# # reorder the levels 
-# census_data$education <- factor(census_data$education ,
-#                                         levels(census_data$education )[c(3, 4,1:2)])
-# census_data$household_income <- factor(census_data$household_income,
-#                                       levels(census_data$household_income)[c(5, 3, 4,1:2)])
+```{r fig1, fig.cap="Newspaper Advertising Revenues (in dollars) and Number of Journalists in the United States, 1980-2015", message = FALSE,echo = FALSE, warning=FALSE, fig.height = 8, fig.width = 6}
+
+fontSize <- 12
+# make line and dot plot of figure 1 
+p2 <- ggplot(data = df1, mapping = aes(x = year, y = newspapers)) +
+   geom_point() +
+    geom_line() +
+    labs(y = "Advertising Revenues Million US$") + 
+    theme_bw()+ 
+ theme(axis.text.x = element_text(size = fontSize -2, colour = "black"),
+      axis.text.y = element_text(size = fontSize - 2, colour = "black"),
+      axis.title.x = element_text(size = fontSize),
+      axis.title.y = element_text(size = fontSize),
+      legend.text = element_text(size= fontSize - 2),
+      legend.title = element_text(size= fontSize),
+      legend.position="bottom")
+
+# make line and dot plot of figure number of journalists 
+p3 <- ggplot(data = df1, mapping = aes(x = year, y = nb_journ)) +
+   geom_point() +
+    geom_line() +
+    labs(y = "Number of Journalists") + 
+    theme_bw() + 
+ theme(axis.text.x = element_text(size = fontSize -2, colour = "black"),
+      axis.text.y = element_text(size = fontSize - 2, colour = "black"),
+      axis.title.x = element_text(size = fontSize),
+      axis.title.y = element_text(size = fontSize),
+      legend.text = element_text(size= fontSize - 2),
+      legend.title = element_text(size= fontSize),
+      legend.position="bottom")
+
+# combine two plots together 
+g2 <- ggplotGrob(p2)
+g3 <- ggplotGrob(p3)
+g <- rbind(g2, g3, size = "first")
+g$widths <- unit.pmax(g2$widths, g3$widths)
+grid.draw(g)
+
+```
+
+
+```{r variables, include = FALSE}
+# all variables 
+# colnames(dfNews)
+
+############## Advertising side ###################
+# ln_ra_cst2 ln_ads_p1_cst2 ln_ads_p4_cst ln_ads_q
+# Advertising revenues,  Ad revenues/ circulation, (Listed) ad price, Advertising space
+
+############## Readership ###################
+
+############## Heterogenous Effects: ###################
 ```
 
 `r table_nums('tab_1')`
 
 ```{r table1, fig.cap=tab.1_cap, echo = FALSE}
 # Characteristics summary table, EDA stage
-# my_labels <- list(
-#   age = "Age",
-#   gender = "Gender",
-#   race = "Race/Ethnicity",
-#   education = "Education",
-#   household_income = "Household Income",
-#   employment = "Employment Status"
-# )
-# 
-# 
-# table1 <- tableby(~age + gender + race + education + household_income + employment, data = survey_data)
-# summary(table1, labelTranslations = my_labels) %>% 
-#    kable()
+# list of variables to make summary table 
+my_labels <- list(
+  po_cst = "Unit buyer price",
+  ps_cst = "Subscription price",
+  ads_p4_cst = "Ad rate (listed price)",
+  rtotal_cst = "Total revenues (€)",
+  ra_cst =  "Revenues from advertising (€)",
+  nb_journ = "Number of journalists",
+  news_hole = "Newshole (nonadvertising space)"
+)
+
+# national data
+# # summary table 
+
+table1 <- tableby(~ po_cst + ps_cst + ads_p4_cst + rtotal_cst + ra_cst + nb_journ + news_hole , 
+                  data = dfNews[dfNews$national == 1, ])
+summary(table1, labelTranslations = my_labels) %>%
+   kable()
 
 ```
 
@@ -178,123 +206,127 @@ tab.2_cap <- table_nums(name = "tab_2",
 `r table_nums('tab_2')`
 
 ```{r table2, fig.cap=tab.2_cap, echo = FALSE}
-# Characteristics summary table, EDA stage, combination of levels 
-# 
-# table2 <- tableby(~age + gender + race + education + household_income + employment, data = census_data)
-# summary(table2, labelTranslations = my_labels) %>% 
-#    kable()
+# list of variables to make summary table 
+my_labels <- list(
+  po_cst = "Unit buyer price",
+  ps_cst = "Subscription price",
+  ads_p4_cst = "Ad rate (listed price)",
+  rtotal_cst = "Total revenues (€)",
+  ra_cst =  "Revenues from advertising (€)",
+  nb_journ = "Number of journalists",
+  news_hole = "Newshole (nonadvertising space)"
+)
+
+# local data
+# summary table 
+
+table1 <- tableby(~ po_cst + ps_cst + ads_p4_cst + rtotal_cst + ra_cst + nb_journ + news_hole , 
+                  data = dfNews[dfNews$national == 0, ])
+summary(table1, labelTranslations = my_labels) %>%
+   kable()
 
 ```
 
 
+```{r fig2, fig.cap="Advertising Revenues in France by Media Outlets", message = FALSE,echo = FALSE, warning=FALSE, fig.height = 4, fig.width = 6}
+# transform data from wide to long to generate plot 
+fontSize <- 12
+dftmp <- df23 %>% select(year, adpqn, adpqr, adtv) %>% rename(`National Newspaper` = adpqn,
+                                                              `Local Newspaper` = adpqr,
+                                                              TVs= adtv) %>% 
+    pivot_longer(cols =  `National Newspaper`:TVs, names_to = "Media", values_to = "Advertising Revenues") %>% mutate( Year = factor(year) )
 
-```{r survey, fig.cap="2020-06-25 Nationscape Election Poll by State", message = FALSE,echo = FALSE, warning=FALSE, fig.height = 8, fig.width = 6}
-#COmpare the percentage of people from each state voting for either candidate.
-# fontSize <- 12
-# df <- survey_data %>%
-#            group_by(state, vote) %>% summarize(n = n()) %>% 
-#             mutate(pct = n/sum(n),  lbls = scales::percent(pct))
-# 
-# p1 <- ggplot(df, 
-#        aes(x = factor(state), y = pct, fill = vote )) + 
-#   coord_flip() +
-#   geom_bar(stat = "identity", position = "fill" ) +
-#            # , width = 1.5 ) +
-#   scale_y_continuous(breaks = seq(0, 1, .2), label = scales::percent) +
-#   geom_text(aes(label = lbls),  size = 3,  position = position_stack(vjust = 0.5), color = "black") +
-#   scale_fill_grey(start = 0.6, end = 0.8) +
-#   labs(y = "Relative Frequency", x = "States", fill = "2020/06/25 Nationscape Election Poll")+
-#   theme_minimal() +
-#  theme(axis.text.x = element_text(size = fontSize -2, colour = "black"),
-#       axis.text.y = element_text(size = fontSize - 2, colour = "black"),
-#       axis.title.x = element_text(size = fontSize),
-#       axis.title.y = element_text(size = fontSize),
-#       legend.text = element_text(size= fontSize - 2),
-#       legend.title = element_text(size= fontSize),
-#       legend.position="bottom")
-# 
-# p1 
+# make plots 
+p1 <- ggplot(data = dftmp, aes(x = Media, y = `Advertising Revenues`, fill = Year)) +
+    geom_bar(stat = 'identity', position = "dodge" , width = 0.5) +
+    theme_bw() + 
+    scale_fill_brewer(palette = "Paired") + 
+  labs(y = "Advertising Revenues (million euros)") +
+ theme(axis.text.x = element_text(size = fontSize -2, colour = "black"),
+      axis.text.y = element_text(size = fontSize - 2, colour = "black"),
+      axis.title.x = element_text(size = fontSize),
+      axis.title.y = element_text(size = fontSize),
+      legend.text = element_text(size= fontSize - 2),
+      legend.title = element_text(size= fontSize),
+      legend.position="bottom")
+p1
 ```
 
 
+```{r figure3, fig.cap="Effects on National Newspaper from Advertisment on TV", fig.height = 5.5, fig.width = 8, echo=FALSE}
+# factor datasets 
+dftmp <- df4 %>% mutate(Year = factor(year))
 
+fontSize <- 12
+p1 <- ggplot(data = dftmp, aes(x = Year, y = nb_PQN22)) +
+       geom_bar(stat = "identity", width = 0.5, fill = "lightblue") +
+       theme_bw() +
+     labs(y = "Number of Advertisement (OTC Drugs) in National Newspaper") +
+ theme(axis.text.x = element_text(size = fontSize -2, colour = "black"),
+      axis.text.y = element_text(size = fontSize - 2, colour = "black"),
+      axis.title.x = element_text(size = fontSize),
+      axis.title.y = element_text(size = fontSize),
+      legend.text = element_text(size= fontSize - 2),
+      legend.title = element_text(size= fontSize),
+      legend.position="bottom")
 
-
-```{r compareplot1, echo = FALSE, message = FALSE, fig.cap="Comparison of Age Distributions Between Two Datasets",  fig.height = 4, fig.width = 6}
-# fontSize <- 12
-# p1 <- ggplot(data = survey_data, aes(age)) +
-#       geom_bar(aes(y = stat(count)/sum(stat(count))), width = 0.5 ) +
-#    labs(y = "Relative Frequencies", caption = "Age Distribution of Nationscape Survey Data") + 
-#   scale_y_continuous(labels=scales::percent) + 
-#    # scale_fill_brewer(type = "div", palette = "RdBu") +
-#   theme_bw() +
-#   # geom_text(aes(Age, MedianIn + 3000, label = round(MedianIn,2) ), color = "black", size = 4) +
-# theme(axis.text.x = element_text(size = fontSize -2, colour = "black"),
-#       axis.text.y = element_text(size = fontSize - 2, colour = "black"),
-#       axis.title.x = element_text(size = fontSize),
-#       axis.title.y = element_text(size = fontSize),
-#       legend.text = element_text(size= fontSize - 2),
-#       legend.title = element_text(size= fontSize),
-#       legend.position="bottom")
-# 
-# p2 <- ggplot(data = census_data, aes(age)) +
-#       geom_bar(aes(y = stat(count)/sum(stat(count))), width = 0.5 ) +
-#    labs(y = "Relative Frequencies", caption = "Age Distribution of 2018 ACS Census Data") + 
-#   scale_y_continuous(labels=scales::percent) + 
-#    # scale_fill_brewer(type = "div", palette = "RdBu") +
-#   theme_bw() +
-#   # geom_text(aes(Age, MedianIn + 3000, label = round(MedianIn,2) ), color = "black", size = 4) +
-# theme(axis.text.x = element_text(size = fontSize -2, colour = "black"),
-#       axis.text.y = element_text(size = fontSize - 2, colour = "black"),
-#       axis.title.x = element_text(size = fontSize),
-#       axis.title.y = element_text(size = fontSize),
-#       legend.text = element_text(size= fontSize - 2),
-#       legend.title = element_text(size= fontSize),
-#       legend.position="bottom")
-# 
-# grid.arrange(p1, p2, nrow = 1)
+p2 <- ggplot(data = dftmp, aes(x = Year, y = nb_TV22)) +
+       geom_bar(stat = "identity", width = 0.5, fill = "navy") +
+       theme_bw() +
+     labs(y = "Number of Advertisement (OTC Drugs) on TV") +
+ theme(axis.text.x = element_text(size = fontSize -2, colour = "black"),
+      axis.text.y = element_text(size = fontSize - 2, colour = "black"),
+      axis.title.x = element_text(size = fontSize),
+      axis.title.y = element_text(size = fontSize),
+      legend.text = element_text(size= fontSize - 2),
+      legend.title = element_text(size= fontSize),
+      legend.position="bottom")
+# combine plots 
+grid.arrange(p1, p2, nrow = 1)
 
 ```
 
 
-```{r compareplot2, echo = FALSE, message = FALSE, fig.cap="Comparison of Household Income Distributions Between Two Datasets",  fig.height = 5, fig.width = 8}
-# fontSize <- 12
-# p1 <- ggplot(data = survey_data, aes(household_income)) +
-#       geom_bar(aes(y = stat(count)/sum(stat(count))), width = 0.5 ) +
-#    labs(y = "Relative Frequencies", caption = "Household Income Distribution of Nationscape Survey Data", x = "Household Income") + 
-#   scale_y_continuous(labels=scales::percent) + 
-#    # scale_fill_brewer(type = "div", palette = "RdBu") +
-#   theme_bw() +
-#   # geom_text(aes(Age, MedianIn + 3000, label = round(MedianIn,2) ), color = "black", size = 4) +
-# theme(axis.text.x = element_text(size = fontSize -2, 
-#                                  colour = "black", angle = 45 , hjust = 0.6, vjust = 0.6),
-#       axis.text.y = element_text(size = fontSize - 2, colour = "black"),
-#       axis.title.x = element_text(size = fontSize),
-#       axis.title.y = element_text(size = fontSize),
-#       legend.text = element_text(size= fontSize - 2),
-#       legend.title = element_text(size= fontSize),
-#       legend.position="bottom")
-# 
-# p2 <- ggplot(data = census_data, aes(household_income)) +
-#       geom_bar(aes(y = stat(count)/sum(stat(count))), width = 0.5 ) +
-#    labs(y = "Relative Frequencies", x = "Household Income",
-#         caption = "Household Income Distribution of 2018 ACS Census Data") + 
-#   scale_y_continuous(labels=scales::percent) + 
-#    # scale_fill_brewer(type = "div", palette = "RdBu") +
-#   theme_bw() +
-#   # geom_text(aes(Age, MedianIn + 3000, label = round(MedianIn,2) ), color = "black", size = 4) +
-# theme(axis.text.x = element_text(size = fontSize -2, 
-#                                  colour = "black", angle = 45 , hjust = 0.6, vjust = 0.6),
-#       axis.text.y = element_text(size = fontSize - 2, colour = "black"),
-#       axis.title.x = element_text(size = fontSize),
-#       axis.title.y = element_text(size = fontSize),
-#       legend.text = element_text(size= fontSize - 2),
-#       legend.title = element_text(size= fontSize),
-#       legend.position="bottom")
-# 
-# grid.arrange(p1, p2, nrow = 1)
+```{r figure4, fig.cap="Measure of Television Quality", fig.height = 6.5, fig.width = 7, echo=FALSE}
+# factor datasets 
+# as.numeric(df5$year)
+dftmp <- df5 %>% mutate(Year = factor(year), year = as.numeric(year))
+# make plots 
+fontSize <- 12
+p1 <- ggplot(data = dftmp, aes(x = year, y = nb_transmitters_all)) +
+       geom_point() + 
+      geom_path() + 
+       geom_vline(xintercept = 1967, color = "red") +
+       theme_bw() +
+  scale_x_continuous(breaks  = 1960:1975)  + 
+     labs(y = "No. Transmitters of All TV Channels", x = "Year") +
+ theme(axis.text.x = element_text(size = fontSize -2, colour = "black"),
+      axis.text.y = element_text(size = fontSize - 2, colour = "black"),
+      axis.title.x = element_text(size = fontSize),
+      axis.title.y = element_text(size = fontSize),
+      legend.text = element_text(size= fontSize - 2),
+      legend.title = element_text(size= fontSize),
+      legend.position="bottom")
 
+p2 <- ggplot(data = dftmp, aes(x = year, y = journalistes)) +
+       geom_point() + 
+       geom_vline(xintercept = 1967, color = "red") +
+       theme_bw() +
+    geom_path() + 
+    scale_x_continuous(breaks  = 1960:1975)  + 
+     labs(y = "No. Journalists of TV Channels", x = "Year") +
+ theme(axis.text.x = element_text(size = fontSize -2, colour = "black"),
+      axis.text.y = element_text(size = fontSize - 2, colour = "black"),
+      axis.title.x = element_text(size = fontSize),
+      axis.title.y = element_text(size = fontSize),
+      legend.text = element_text(size= fontSize - 2),
+      legend.title = element_text(size= fontSize),
+      legend.position="bottom")
+
+# combine plots 
+grid.arrange(p1, p2, ncol = 1)
 ```
+
 
 ## Model
 
@@ -314,95 +346,130 @@ Equation (1) represents the complete model, and Equation (2) represents our fina
 
 ### Discussion on features selection.
 
+```{r fitlm1, include=FALSE}
+# fit ols linear regression model 
+dfNews <- dfNews %>% mutate(year = factor(year), id_news = factor(id_news))
 
-```{r fitglm, include=FALSE}
-# names(survey_data)
-# # survey_data$stateid %>% levels()
-# # glm, logistic regression with sex age place
-# lg_full <- glm(vote ~ age + gender + stateid + race + education + employment + household_income,
-#                data = survey_data, family = "binomial")
-# broom::tidy(lg_full)
-# summary(lg_full)
-# 
-# # fit model without education
-# lg_edu <- glm(vote ~ age + gender + stateid + race + employment + household_income,
-#                data = survey_data, family = "binomial")
-# summary(lg_edu)
-# 
-# # fit model without household_income 
-# lg_income <- glm(vote ~ age + gender + stateid + race + education + employment,
-#                data = survey_data, family = "binomial")
-# summary(lg_income)
-# 
-# # fit model without employment 
-# lg_employment <- glm(vote ~ age + gender + stateid + race + education + household_income,
-#                data = survey_data, family = "binomial")
-# summary(lg_employment)
-# #
-# anova(lg_full, lg_employment)
-
-# the model no employment was chosed as the final model 
+############## Advertising side ###################
+# ln_ra_cst2 ln_ads_p1_cst2 ln_ads_p4_cst ln_ads_q
+# Advertising revenues,  Ad revenues/ circulation, (Listed) ad price, Advertising space
+lm_ra_cst2 <- lm(ln_ra_cst2 ~ after_national + id_news + year, data = dfNews)
+lm_ads_p1_cst2 <- lm(ln_ads_p1_cst2 ~ after_national + id_news + year, data = dfNews)
+lm_ln_ads_p4_cst <- lm(ln_ads_p4_cst ~ after_national + id_news + year, data = dfNews)
+lm_ln_ads_q <- lm(ln_ads_q ~ after_national + id_news + year, data = dfNews)
 
 ```
+
+
+```{r fitlm2, include=FALSE}
+# fit ols linear regression model 
+dfNews <- dfNews %>% mutate(year = factor(year), id_news = factor(id_news))
+
+############## Reader side ###################
+# ln_ps_cst ln_po_cst ln_qtotal ln_qs_s ln_rs_cst
+# Subscription price, Unit price, circulation, Share of subscribers, Revenues from sales
+
+lm_ps_cst <- lm(ln_ps_cst ~ after_national + id_news + year, data = dfNews)
+lm_po_cst <- lm(ln_po_cst ~ after_national + id_news + year, data = dfNews)
+lm_qtotal <- lm(ln_qtotal ~ after_national + id_news + year, data = dfNews)
+lm_qs_s <- lm(ln_qs_s ~ after_national + id_news + year, data = dfNews)
+
+lm_rs_cst <- lm(ln_rs_cst ~ after_national + id_news + year, data = dfNews)
+
+```
+
+
+```{r fitlm3, include=FALSE}
+# fit ols linear regression model 
+dfNews <- dfNews %>% mutate(year = factor(year), id_news = factor(id_news))
+
+############## Quality ###################
+# ln_nb_journ ln_av_payroll_cst ln_pages ln_news_hole
+# Number of journalists, Average payroll, Number of pages, Newshole, Share of hard news on front page (percent)
+lm_nb_journ <- lm(ln_nb_journ ~ after_national + id_news + year, data = dfNews)
+lm_av_payroll <- lm(ln_av_payroll_cst ~ after_national + id_news + year, data = dfNews)
+lm_pages <- lm(ln_pages ~ after_national + id_news + year, data = dfNews)
+lm_news_hole <- lm(ln_news_hole ~ after_national + id_news + year, data = dfNews)
+
+```
+
+
 
 
 All work were done in `R` (version 4.0.2) [@R-base] and `Rstudio` (version 1.3.1093). `Tidyverse` (version 1.3.0) was used for data wrangling and visualization [@Tidyverse]. R package `forcats` (version 0.5.0) was also used for data pre-processing [@Forcats]. There are other packages used such as `captioner`, `gridExtra`, `broom`, `Haven`, `magrittr`, `knitr`, `labelled` and `arsenal` [@Captioner; @Stargazer; @Arsenal; @Knitr; @Haven; @gridExtra; @Broom; @magrittr; @Labelled]. Code are available at: https://github.com/. 
 
 
 
-```{r predict, echo=FALSE, include= FALSE }
-# get the log odds of estimate
-# census_data$rawestimate <-
-# lg_employment %>%
-# predict(newdata = census_data)
-# 
-# # transform to probability 
-# census_data$estimate <- as.numeric(exp(census_data$rawestimate)/(1+exp(census_data$rawestimate)))
-# census_data %<>% drop_na()
-# biden <- mean(census_data$estimate)
-# 
-# # no probability == 0.5 found 
-# census_data[census_data$estimate == 0.5,]
-# # from estimate to vote, use prob cut = 0.5
-# census_data <- census_data %>% mutate(vote = ifelse(estimate > 0.5, "Joe Biden", "Donald Trump"))
-
-```
-
-
 # Results
 
-```{r resState, fig.cap="Election Forecast with 2018 ACS Census Data by State", message = FALSE,echo = FALSE, warning=FALSE, fig.height = 9, fig.width = 7}
-# fontSize <- 12
-# df <- census_data %>%
-#            group_by(state, vote) %>% summarize(n = n()) %>% 
-#             mutate(pct = n/sum(n),  lbls = scales::percent(pct))
-# # number of state Trump would take 
-# result <- df[ (df$vote == "Donald Trump") & ( df$pct > 0.5) , -c(3,5)]
-# number_states <- nrow(result)
-# 
-# # generate plot 
-# p1 <- ggplot(df, 
-#        aes(x = factor(state), y = pct, fill = vote )) + 
-#   coord_flip() +
-#   geom_bar(stat = "identity", position = "fill" ) +
-#            # , width = 1.5 ) +
-#   scale_y_continuous(breaks = seq(0, 1, .2), label = scales::percent) +
-#   geom_text(aes(label = lbls),  size = 3,  position = position_stack(vjust = 0.5), color = "black") +
-#   scale_fill_grey(start = 0.6, end = 0.8) +
-#   labs(y = "Relative Frequency", x = "States", fill = "Election Prediction with 2018 ACS Census Data")+
-#   theme_minimal() +
-#  theme(axis.text.x = element_text(size = fontSize -2, colour = "black"),
-#       axis.text.y = element_text(size = fontSize - 2, colour = "black"),
-#       axis.title.x = element_text(size = fontSize),
-#       axis.title.y = element_text(size = fontSize),
-#       legend.text = element_text(size= fontSize - 2),
-#       legend.title = element_text(size= fontSize),
-#       legend.position="bottom")
-# 
-# p1 
+`r table_nums('tab_3')`
+
+```{r table3, fig.cap=tab.3_cap, echo = FALSE, results='asis'}
+# fit all lms 
+# summary table 
+# summary table of lm regression results 
+stargazer(lm_ra_cst2, lm_ads_p1_cst2, lm_ln_ads_p4_cst , lm_ln_ads_q, 
+          # title="Results",
+          #  align=TRUE,
+           column.labels = c("Ad Revenues", "Ad Revenues (per)", "Ad Listed Price", "Ad Space"),
+          dep.var.labels.include = FALSE,
+          report = "vct*",
+          omit = c("id_news", "year"),
+          model.names = FALSE, 
+           covariate.labels = c("National × Post-TV ad", "Intercept") ,
+          type='latex', header=FALSE,
+          omit.stat = c("ser", "f") )
+
 ```
 
 
+`r table_nums('tab_4')`
+
+```{r tb4, echo = FALSE, results='asis', fig.cap=tab.4_cap}
+
+# Subscription price, Unit price, circulation, Share of subscribers, Revenues from sales
+
+# summary table of lm regression results 
+stargazer(lm_ps_cst, lm_po_cst, lm_qtotal, lm_qs_s, lm_rs_cst,
+          # title="Results",
+          #  align=TRUE,
+           column.labels = c("Sub. Price", "Unit Price", 
+                             "Circulation", "Share of Sub.", "Revenues (sales)"),
+          dep.var.labels.include = FALSE,
+          report = "vct*",
+          omit = c("id_news", "year"),
+          model.names = FALSE, 
+           covariate.labels = c("National × Post-TV ad", "Intercept") ,
+          type='latex', header=FALSE,
+          omit.stat = c("ser", "f") )
+
+
+```
+
+
+`r table_nums('tab_5')`
+
+```{r tb5, echo = FALSE, results='asis', fig.cap=tab.5_cap}
+############## Quality ###################
+# ln_nb_journ ln_av_payroll_cst ln_pages ln_news_hole
+# Number of journalists, Average payroll, Number of pages, Newshole, Share of hard news on front page (percent)
+
+# summary table of lm regression results 
+stargazer(lm_nb_journ, lm_av_payroll, lm_pages, lm_news_hole,
+          # title="Results",
+          #  align=TRUE,
+           column.labels = c("No. Journalists", "Average Payroll", 
+                             "No. Pages", "Newshole"),
+          dep.var.labels.include = FALSE,
+          report = "vct*",
+          omit = c("id_news", "year"),
+          model.names = FALSE, 
+           covariate.labels = c("National × Post-TV ad", "Intercept") ,
+          type='latex', header=FALSE,
+          omit.stat = c("ser", "f") )
+
+
+```
 
 # Discussion
 
@@ -422,30 +489,14 @@ It is worthwhile mentioning that
 ## Weaknesses and next steps
 
 As we mentioned above, 
+
+
 \newpage
 
 # Appendix {-}
 
-```{r edafigures, fig.width = 4, fig.height= 3}
-# the model
-# broom::tidy(lg_employment)
-# # there are 50 states plus 1 distric
-# survey_data$state %>% levels()
-# # barplots 
-# barplot(table(survey_data$gender  ) )
-# barplot(table(survey_data$education ) )
-# barplot(table(survey_data$employment ) )
-# barplot(table(survey_data$race ) )
-# barplot(table(survey_data$household_income  ) )
-# barplot(table(survey_data$age ) )
-# 
-# # doule check the distribution of data, categorical
-# barplot(table(census_data$gender  ) )
-# barplot(table(census_data$race ) )
-# barplot(table(census_data$household_income  ) )
-# barplot(table(census_data$employment  ) )
-# barplot(table(census_data$age ) )
-# barplot(table(census_data$education ) )
+```{r edafigures, fig.width = 4, fig.height= 3, echo=FALSE}
+
 
 ```
 
