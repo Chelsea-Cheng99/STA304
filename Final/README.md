@@ -6,13 +6,17 @@ The main purpose of the final project is to conduct original research that appli
 
 # Introduction 
 
-
+This is a reproduce of the paper [**Newspapers in Times of Low Advertising Revenues**](https://www.aeaweb.org/articles?id=10.1257/mic.20170306).
 
 # Section
 
 ## Inputs
 
-Inputs contain data. Data may not be allowed to distribute.
+The data was not uploaded, but can be found at the original source together with the paper, [**Newspapers in Times of Low Advertising Revenues**](https://www.aeaweb.org/articles?id=10.1257/mic.20170306).
+
+Inputs contain data. 
+
+Data may not be allowed to distribute.
 
 ## Notes
 
